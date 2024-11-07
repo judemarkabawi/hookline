@@ -13,9 +13,12 @@
 #include <physics/Components.hpp>
 
 #include "core/CameraComponent.hpp"
+#include "gameplay/ProjectileSystem.hpp"
 #include "gameplay/CollectableSystem.hpp"
 #include "physics/CollisionSystem.hpp"
 #include "physics/PhysicsSystem.hpp"
+
+#include "gameplay/LevelData.cpp"
 
 /**
  * Main Game class
@@ -33,6 +36,11 @@ class Game {
     void update(float dt);
     void render(glm::uvec2 drawable_size);
     bool handle_event(SDL_Event const &event, glm::uvec2 drawable_size);
+    void generate_fixed_tiles(const LevelData &level_data);
+
+    float next_horizontal_projectile_height = 4.0f;
+    float next_chasing_projectile_height = 5.0f;
+    float next_splash_projectile_height = 3.0f;
 
     struct Player {
         entt::entity entity;
@@ -51,5 +59,6 @@ class Game {
     CollisionSystem collisions;
     CollectableSystem collectables;
     CameraComponent camera;
+    ProjectileSystem projectileSystem;
     entt::registry registry;
 };

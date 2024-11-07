@@ -1,6 +1,7 @@
 #include "RenderComponent.hpp"
 
 #include "core/TransformComponent.hpp"
+#include "gameplay/ProjectileComponent.hpp"
 
 RenderComponent::RenderComponent(std::vector<glm::vec2>&& vertices,
                                  bool visible)

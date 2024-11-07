@@ -15,6 +15,8 @@
 
 #include "constants.hpp"
 #include "core/InputComponent.hpp"
+#include "gameplay/HealthComponent.hpp"
+#include "gameplay/ProjectileComponent.hpp"
 #include "core/RenderComponent.hpp"
 #include "core/TransformComponent.hpp"
 #include "physics/Components.hpp"
@@ -22,6 +24,20 @@
 #include "physics/PhysicsSystem.hpp"
 #include "physics/util.hpp"
 #include "util/misc.hpp"
+
+void Game::generate_fixed_tiles(const LevelData &level_data) {
+        for (const auto &position : level_data.tile_positions) {
+            auto box = registry.create();
+            registry.emplace<TransformComponent>(
+                box,
+                TransformComponent(position, glm::vec2{0.05f, 0.05f}, 0.0f));
+            registry.emplace<RigidBodyComponent>(box);
+            registry.emplace<ColliderComponent>(
+                box, ColliderComponent(glm::vec2{1.0f, 1.0f}, true, false));
+            registry.emplace<RenderComponent>(
+                box, hookline::get_basic_shape_debug(), true);
+        }
+}
 
 Game::Game() {
     // Initialize player
@@ -36,9 +52,54 @@ Game::Game() {
         registry.emplace<RenderComponent>(player,
                                           hookline::get_basic_shape_debug());
         registry.emplace<InputComponent>(player);
+        registry.emplace<HealthComponent>(player, 3);
         player_.entity = player;
     }
 
+    {
+        LevelData fixed_level = {
+    {
+        // Initial arrow pattern
+        {0.2f, 0.1f}, {0.1f, 0.0f}, {0.4f, 0.1f}, {0.5f, 0.0f},
+        {0.3f, -0.1f}, {0.3f, 0.0f}, {0.3f, 0.1f}, {0.3f, 0.2f},
+        {0.3f, -0.2f}, {0.3f, -0.3f},
+        
+        // Section 1: Height 0.0 to 2.0
+        {-0.6f, 0.5f}, {0.3f, 1.2f}, {0.8f, 1.8f}, {0.2f, 0.7f}, {-0.4f, 1.5f},
+        
+        // Section 2: Height 2.0 to 4.0
+        {0.6f, 2.5f}, {-0.5f, 3.1f}, {0.1f, 2.8f}, {-0.3f, 3.7f},
+        
+        // Section 3: Height 4.0 to 6.0
+        {0.7f, 4.2f}, {0.3f, 5.1f}, {-0.4f, 4.5f}, {0.5f, 5.8f}, {-0.2f, 4.8f},
+        
+        // Section 4: Height 6.0 to 8.0
+        {-0.3f, 6.5f}, {0.2f, 7.3f}, {0.6f, 7.9f}, {-0.1f, 7.5f},
+        
+        // Section 5: Height 8.0 to 10.0
+        {0.1f, 8.2f}, {-0.6f, 8.5f}, {0.3f, 9.4f}, {-0.2f, 9.0f}, {0.4f, 9.7f},
+        
+        // Section 6: Height 10.0 to 12.0
+        {-0.5f, 10.3f}, {0.6f, 11.1f}, {0.2f, 10.6f}, {-0.4f, 11.8f}, {0.0f, 10.9f},
+        
+        // Section 7: Height 12.0 to 14.0
+        {0.5f, 12.5f}, {-0.6f, 13.2f}, {0.3f, 13.7f}, {0.1f, 12.9f},
+        
+        // Section 8: Height 14.0 to 16.0
+        {-0.3f, 14.5f}, {0.7f, 15.0f}, {0.2f, 15.4f}, {0.4f, 14.9f},
+        
+        // Section 9: Height 16.0 to 18.0
+        {0.0f, 16.7f}, {-0.6f, 17.3f}, {0.5f, 17.9f}, {0.2f, 16.1f},
+        
+        // Section 10: Height 18.0 to 20.0
+        {0.1f, 18.4f}, {-0.5f, 18.9f}, {0.4f, 19.3f}, {-0.2f, 19.8f}
+    }
+};
+
+
+        generate_fixed_tiles(fixed_level);
+    }
+    /*
     // Create a few immovable boxes somewhere
     {
         std::vector<glm::vec2> positions = {glm::vec2{0.5f, 0.5f},
@@ -56,6 +117,7 @@ Game::Game() {
                 box, hookline::get_basic_shape_debug(), true);
         }
     }
+    
 
     {
          // Randomly generate tiles
@@ -75,7 +137,7 @@ Game::Game() {
             registry.emplace<RenderComponent>(tile, hookline::get_basic_shape_debug(), true);
         }
     }
-
+    */
     // Create a ground
     {
         auto box = registry.create();
@@ -103,9 +165,10 @@ Game::Game() {
 
     // Spawn some collectables for demo
     {
-        collectables.spawn_random(registry);
-        collectables.spawn_random(registry);
-        collectables.spawn_random(registry);
+    }
+
+    // Spawn some projectiles for demo
+    {
     }
 }
 
@@ -158,10 +221,39 @@ void Game::update(float dt) {
     }
     camera.follow_player(player_transform.position.y);
 
+    float player_height = player_transform.position.y;
+    if (player_height >= next_horizontal_projectile_height) {
+        projectileSystem.spawn_horizontal_projectile(true, player_height, registry);
+        next_horizontal_projectile_height += 4.0f;  // Set the next trigger
+    }
+
+    // Fire a chasing projectile every 5 units of height
+    if (player_height >= next_chasing_projectile_height) {
+        glm::vec2 spawn_position = player_transform.position + glm::vec2(0.5f, 1.0f);
+        projectileSystem.spawn_chasing_projectile(spawn_position, registry);
+        next_chasing_projectile_height += 5.0f;  // Set the next trigger
+    }
+
+    // Fire a splash projectile every 3 units of height
+    if (player_height >= next_splash_projectile_height) {
+        glm::vec2 spawn_position = player_transform.position + glm::vec2(-0.5f, 1.0f);
+        projectileSystem.spawn_spray_projectile(spawn_position, registry);
+        next_splash_projectile_height += 3.0f;  // Set the next trigger
+    }
+    auto &health = registry.get<HealthComponent>(player_.entity);
+        if (health.health <= 0) {
+        // Destroy the player entity
+        // TODO: This doesn't exit gracefully now
+        registry.destroy(player_.entity);
+        std::cout << "Player has been removed from the game due to health depletion." << std::endl;
+        return;  
+    }
+
     // System updates
     physics.update(dt, registry);
     collisions.update(dt, registry);
     collectables.update(dt, registry, player_.entity);
+    projectileSystem.update(dt, registry, player_.entity);
 }
 
 void Game::render(glm::uvec2 drawable_size) {
@@ -226,3 +318,4 @@ bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
     }
     return false;
 }
+
