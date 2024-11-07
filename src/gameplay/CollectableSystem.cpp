@@ -10,6 +10,9 @@
 #include "render/RenderComponent.hpp"
 #include "util/misc.hpp"
 
+CollectableSystem::CollectableSystem(AssetManager *asset_manager)
+    : asset_manager_(asset_manager) {}
+
 void CollectableSystem::update(float dt, entt::registry &registry,
                                entt::entity player) {
     (void)dt;
@@ -54,4 +57,5 @@ void CollectableSystem::on_pickup(entt::registry &registry,
     registry.destroy(collectable);
     // spawn_random(registry);
     score += 1;
+    Sound::play(asset_manager_->get_sound("item_pick_up"), 0.5f);
 }

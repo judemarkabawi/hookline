@@ -61,13 +61,21 @@ entt::entity maybe_hookable_box(entt::registry &registry, glm::vec2 position,
 }
 }  // namespace
 
-Game::Game() {
+Game::Game() : collectables(&asset_manager) {
+    // Load assets
+    // TODO: A game/level should read its required assets from some file and
+    // load those as appropriate.
+    load_assets();
+
     // Player and attached camera setup
     setup_player();
     setup_camera();
 
     // All hookable platforms, ground, and collectables
     setup_map();
+
+    // Play music
+    Sound::loop(asset_manager.get_sound("guitar_loop_music"), 0.25);
 }
 
 void Game::update(float dt) {
@@ -178,6 +186,15 @@ bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
         }
     }
     return false;
+}
+
+void Game::load_assets() {
+    asset_manager.load_sound(
+        "item_pick_up",
+        hookline::data_path("../assets/sounds/item_pick_up.opus"));
+    asset_manager.load_sound(
+        "guitar_loop_music",
+        hookline::data_path("../assets/sounds/guitar_loop_music.opus"));
 }
 
 void Game::setup_player() {

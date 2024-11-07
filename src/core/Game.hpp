@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>
 #include <physics/Components.hpp>
 
+#include "core/AssetManager.hpp"
 #include "gameplay/CollectableSystem.hpp"
 #include "physics/CollisionSystem.hpp"
 #include "physics/PhysicsSystem.hpp"
@@ -49,6 +50,7 @@ class Game {
     entt::entity grapple_entity;
     entt::entity camera_entity;
 
+    AssetManager asset_manager;
     RenderSystem rendering;
     std::unique_ptr<CameraSystem> camera_system;
     PhysicsSystem physics;
@@ -57,6 +59,7 @@ class Game {
     entt::registry registry;
 
    private:
+    void load_assets();
     void setup_player();
     void setup_camera();
     void setup_map();

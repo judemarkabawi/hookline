@@ -10,9 +10,10 @@
 #include <memory>
 
 #include "constants.hpp"
+#include "sound/Sound.hpp"
 
 bool Application::init() {
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
     // Ask for an OpenGL context version 3.3, core profile, enable debug:
     SDL_GL_ResetAttributes();
@@ -74,7 +75,7 @@ bool Application::init() {
     // SDL_ShowCursor(SDL_DISABLE);
 
     // Init Sound
-    // --- TODO ---
+    Sound::init();
 
     // Init game
     game_ = std::make_unique<Game>();

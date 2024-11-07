@@ -36,3 +36,18 @@ GLuint AssetManager::get_texture(const std::string &name) {
 
     return texture->second;
 }
+
+void AssetManager::load_sound(const std::string &name,
+                              const std::string &filename) {
+    Sound::Sample sound(filename);
+    sounds_.insert_or_assign(name, std::move(sound));
+}
+
+const Sound::Sample &AssetManager::get_sound(const std::string &name) const {
+    auto sound = sounds_.find(name);
+    if (sound == sounds_.end()) {
+        throw std::runtime_error("Invalid sound name: " + name);
+    }
+
+    return sound->second;
+}
