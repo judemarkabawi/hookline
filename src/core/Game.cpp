@@ -11,6 +11,8 @@
 
 #include <glm/glm.hpp>
 
+#include <iostream>
+
 #include "constants.hpp"
 #include "core/InputComponent.hpp"
 #include "core/RenderComponent.hpp"
@@ -55,6 +57,25 @@ Game::Game() {
         }
     }
 
+    {
+         // Randomly generate tiles
+        std::srand(static_cast<unsigned int>(std::time(nullptr)));  // Seed for randomness
+        int num_tiles = 40;  // Number of tiles to generate
+        float max_height = 10.0f;  // Maximum vertical height of the level
+
+        for (int i = 0; i < num_tiles; ++i) {
+            auto tile = registry.create();
+            
+            float x_position = (std::rand() % 100 / 100.0f) * 2.0f - 1.0f;  // Random x within screen width
+            float y_position = (std::rand() % 100 / 100.0f) * max_height;    // Random y within level height
+
+            registry.emplace<TransformComponent>(tile, TransformComponent(glm::vec2{x_position, y_position}, glm::vec2{0.05f, 0.05f}, 0.0f));
+            registry.emplace<RigidBodyComponent>(tile);
+            registry.emplace<ColliderComponent>(tile, ColliderComponent(glm::vec2{1.0f, 1.0f}, true, false));
+            registry.emplace<RenderComponent>(tile, hookline::get_basic_shape_debug(), true);
+        }
+    }
+
     // Create a ground
     {
         auto box = registry.create();
@@ -91,6 +112,7 @@ Game::Game() {
 void Game::update(float dt) {
     (void)dt;
     // Input
+
 
     /* -- PLAYER INPUT & GRAPPLE -- */
     // TODO: Put input into a separate input component and handle this movement
@@ -134,6 +156,7 @@ void Game::update(float dt) {
                                              player_transform.position);
         grapple_transform.rotation = -glm::atan(direction.y, direction.x);
     }
+    camera.follow_player(player_transform.position.y);
 
     // System updates
     physics.update(dt, registry);
@@ -150,7 +173,9 @@ void Game::render(glm::uvec2 drawable_size) {
     for (auto entity : view) {
         auto &transform = view.get<TransformComponent>(entity);
         auto &renderable = view.get<RenderComponent>(entity);
-        renderable.render(transform);
+        TransformComponent adjusted_transform = transform;
+        adjusted_transform.position.y -= camera.y_offset;
+        renderable.render(adjusted_transform);
     }
 }
 
@@ -188,8 +213,11 @@ bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
             int x, y;
             SDL_GetMouseState(&x, &y);
             player_.mouse.pressed = true;
-            player_.mouse.position =
-                hookline::convert_mouse_to_opengl(x, y, drawable_size);
+
+            glm::vec2 mouse_position = hookline::convert_mouse_to_opengl(x, y, drawable_size);
+            mouse_position.y += camera.y_offset;  // Account for vertical camera offset
+            player_.mouse.position = mouse_position;
+
         }
     } else if (event.type == SDL_MOUSEBUTTONUP) {
         if (event.button.button == SDL_BUTTON_LEFT) {

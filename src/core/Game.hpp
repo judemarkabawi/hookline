@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>
 #include <physics/Components.hpp>
 
+#include "core/CameraComponent.hpp"
 #include "gameplay/CollectableSystem.hpp"
 #include "physics/CollisionSystem.hpp"
 #include "physics/PhysicsSystem.hpp"
@@ -49,5 +50,6 @@ class Game {
     PhysicsSystem physics;
     CollisionSystem collisions;
     CollectableSystem collectables;
+    CameraComponent camera;
     entt::registry registry;
 };
