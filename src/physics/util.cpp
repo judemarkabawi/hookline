@@ -6,7 +6,7 @@
 #include <optional>
 
 #include "core/TransformComponent.hpp"
-#include "physics/Components.hpp"
+#include "physics/ColliderComponent.hpp"
 
 namespace hookline {
 bool point_in_rect(glm::vec2 point, glm::vec2 rect_position,

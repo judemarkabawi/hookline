@@ -1,7 +1,8 @@
 #include "CollisionSystem.hpp"
 
 #include "core/TransformComponent.hpp"
-#include "physics/Components.hpp"
+#include "physics/ColliderComponent.hpp"
+#include "physics/RigidBodyComponent.hpp"
 
 namespace {
 bool check_collision_aabb(const TransformComponent &transform1,
@@ -51,12 +52,12 @@ void CollisionSystem::update(float dt, entt::registry &registry) {
 void CollisionSystem::handle_collision(entt::entity entity1,
                                        entt::entity entity2,
                                        entt::registry &registry) {
-    auto &collider1 = registry.get<ColliderComponent>(entity1);
-    auto &collider2 = registry.get<ColliderComponent>(entity2);
-    auto &transform1 = registry.get<TransformComponent>(entity1);
-    auto &transform2 = registry.get<TransformComponent>(entity2);
-    auto &rigid_body1 = registry.get<RigidBodyComponent>(entity1);
-    auto &rigid_body2 = registry.get<RigidBodyComponent>(entity2);
+    auto [collider1, transform1, rigid_body1] =
+        registry.get<ColliderComponent, TransformComponent, RigidBodyComponent>(
+            entity1);
+    auto [collider2, transform2, rigid_body2] =
+        registry.get<ColliderComponent, TransformComponent, RigidBodyComponent>(
+            entity2);
 
     glm::vec2 delta = transform2.position - transform1.position;
     glm::vec2 overlap = (collider1.size * transform1.scale +

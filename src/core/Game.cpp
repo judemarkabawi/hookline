@@ -18,9 +18,11 @@
 #include "core/TransformComponent.hpp"
 #include "gameplay/HealthComponent.hpp"
 #include "gameplay/ProjectileSystem.hpp"
-#include "physics/Components.hpp"
+#include "physics/ColliderComponent.hpp"
+#include "physics/ForceComponent.hpp"
 #include "physics/GrapplingHook.hpp"
 #include "physics/PhysicsSystem.hpp"
+#include "physics/RigidBodyComponent.hpp"
 #include "physics/util.hpp"
 #include "render/CameraComponent.hpp"
 #include "render/CameraSystem.hpp"
@@ -38,7 +40,7 @@ entt::entity hookable_box(entt::registry &registry, glm::vec2 position,
         box, TransformComponent(position, scale, 0.0f));
     registry.emplace<RigidBodyComponent>(box);
     registry.emplace<ColliderComponent>(
-        box, ColliderComponent(glm::vec2{1.0f, 1.0f}, true, false, true));
+        box, ColliderComponent(glm::vec2{1.0f, 1.0f}).set_can_move(false));
     registry.emplace<RenderComponent>(
         box, RenderComponent::from_vertices_color(
                  hookline::get_basic_shape_debug(), {0.07, 0.11, 0.23, 1.0}));
@@ -54,8 +56,10 @@ entt::entity maybe_hookable_box(entt::registry &registry, glm::vec2 position,
     registry.emplace<TransformComponent>(
         box, TransformComponent(position, scale, 0.0f));
     registry.emplace<RigidBodyComponent>(box);
-    registry.emplace<ColliderComponent>(
-        box, ColliderComponent(glm::vec2{1.0f, 1.0f}, true, false, hookable));
+    registry.emplace<ColliderComponent>(box,
+                                        ColliderComponent(glm::vec2{1.0f, 1.0f})
+                                            .set_can_move(false)
+                                            .set_hookable(hookable));
     registry.emplace<RenderComponent>(box,
                                       RenderComponent::from_vertices_color(
                                           hookline::get_basic_shape_debug()));
@@ -217,8 +221,8 @@ void Game::setup_player() {
                                    glm::vec2{0.05f, 0.05f}, 0.0f));
     registry.emplace<RigidBodyComponent>(player);
     registry.emplace<ForceComponent>(player);
-    registry.emplace<ColliderComponent>(player, glm::vec2{1.0f, 1.0f}, true,
-                                        true, false);
+    registry.emplace<ColliderComponent>(
+        player, ColliderComponent(glm::vec2{1.0f, 1.0f}).set_hookable(false));
     registry.emplace<RenderComponent>(player,
                                       RenderComponent::from_vertices_color(
                                           hookline::get_basic_shape_debug()));
