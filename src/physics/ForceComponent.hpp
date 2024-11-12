@@ -13,7 +13,8 @@
 struct ForceComponent {
     /**
      * TODO: revisit - is there ever a reason to need these split up or can we
-     * just accumulate forces and only store a net? Kept this way for now in case
+     * just accumulate forces and only store a net? Kept this way for now in
+     * case
      */
     std::vector<glm::vec2> linear_forces;
 

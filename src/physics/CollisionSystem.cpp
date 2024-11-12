@@ -68,21 +68,60 @@ void CollisionSystem::handle_collision(entt::entity entity1,
         return;
     }
 
+    glm::vec2 normal;
+
     if (overlap.x < overlap.y) {
-        if (delta.x > 0 && collider1.can_move) {
-            transform1.position.x -= overlap.x;
-        } else if (collider2.can_move) {
-            transform2.position.x += collider2.can_move * overlap.x;
+        // Horizontal resolution
+        if (delta.x > 0) {
+            // Object 1 on left, object 2 on right
+            if (collider1.can_move) {
+                transform1.position.x -= overlap.x;
+            } else {
+                transform2.position.x += overlap.x;
+            }
+        } else {
+            // Object 1 on right, object 2 on left
+            if (collider1.can_move) {
+                transform1.position.x += overlap.x;
+            } else {
+                transform2.position.x -= overlap.x;
+            }
         }
+        normal = glm::vec2(1.0f, 0.0f);
     } else {
-        if (delta.y > 0 && collider1.can_move) {
-            transform1.position.y -= overlap.y;
-        } else if (collider2.can_move) {
-            transform2.position.y += collider2.can_move * overlap.y;
+        // Vertical resolution
+        if (delta.y > 0) {
+            // Object 1 on bottom, object 2 on top
+            if (collider1.can_move) {
+                transform1.position.y -= overlap.y;
+            } else {
+                transform2.position.y += overlap.y;
+            }
+        } else {
+            // Object 1 on top, object 2 on bottom
+            if (collider1.can_move) {
+                transform1.position.y += overlap.y;
+            } else {
+                transform2.position.y -= overlap.y;
+            }
         }
+        normal = glm::vec2(0.0f, 1.0f);
     }
 
-    // Turn off bouncing and sliding
-    rigid_body1.velocity *= !collider1.can_move;
-    rigid_body2.velocity *= !collider2.can_move;
+    // Velocity adjustment
+    glm::vec2 velocity1_normal =
+        glm::dot(rigid_body1.velocity, normal) * normal;
+    glm::vec2 velocity1_tangent = rigid_body1.velocity - velocity1_normal;
+
+    glm::vec2 velocity2_normal =
+        glm::dot(rigid_body2.velocity, normal) * normal;
+    glm::vec2 velocity2_tangent = rigid_body2.velocity - velocity2_normal;
+
+    float bounce = glm::min(rigid_body1.bounce, rigid_body2.bounce);
+    if (collider1.can_move) {
+        rigid_body1.velocity = -bounce * velocity1_normal + velocity1_tangent;
+    }
+    if (collider2.can_move) {
+        rigid_body2.velocity = -bounce * velocity2_normal + velocity2_tangent;
+    }
 }
