@@ -14,7 +14,7 @@ struct RigidBodyComponent {
     void clamp_velocity();
 
     // Builders
-    RigidBodyComponent &with_mass(float mass);
-    RigidBodyComponent &with_bounce(float bounce);
-    RigidBodyComponent &with_velocity(glm::vec2 velocity);
+    RigidBodyComponent &set_mass(float mass);
+    RigidBodyComponent &set_bounce(float bounce);
+    RigidBodyComponent &set_velocity(glm::vec2 velocity);
 };
