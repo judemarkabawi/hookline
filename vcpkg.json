@@ -6,6 +6,7 @@
     "glm",
     "libpng",
     "opengl",
-    "sdl2"
+    "sdl2",
+    "opusfile"
   ]
 }

@@ -1,2 +1,3 @@
 guitar_loop_music: https://pixabay.com/sound-effects/relaxing-guitar-loop-v5-245859/
 item_pick_up: https://pixabay.com/sound-effects/item-pick-up-38258/
+retro_hurt: https://pixabay.com/sound-effects/retro-hurt-2-236675/

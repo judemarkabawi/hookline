@@ -72,6 +72,7 @@ find_package(GLEW REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(PNG REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
+find_package(OpusFile CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     # entt
     EnTT::EnTT
@@ -85,6 +86,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     # SDL
     $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
     $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+    # OpusFile
+    OpusFile::opusfile
 )
 # target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/vendor)
 

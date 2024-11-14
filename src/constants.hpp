@@ -28,7 +28,7 @@ constexpr float g = -2.0f;
 constexpr float drag = 1.0f;
 
 // Grapple
-constexpr float grapple_max_length = 15.0f;
+constexpr float grapple_max_length = 4.0f;
 constexpr float grapple_pull_force = 5.0f;
 constexpr float grapple_deactive_distance = 0.01f;
 

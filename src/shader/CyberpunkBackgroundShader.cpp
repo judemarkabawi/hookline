@@ -3,7 +3,6 @@
 #include "util/gl_compile_program.hpp"
 
 CyberpunkBackgroundShader::CyberpunkBackgroundShader() {
-    glCreateShader(GL_VERTEX_SHADER);
     program = gl_compile_program(
         // vertex shader
         "#version 330\n"

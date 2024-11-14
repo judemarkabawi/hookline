@@ -16,6 +16,8 @@
 #include "constants.hpp"
 #include "core/InputComponent.hpp"
 #include "core/TransformComponent.hpp"
+#include "gameplay/HealthComponent.hpp"
+#include "gameplay/ProjectileSystem.hpp"
 #include "physics/Components.hpp"
 #include "physics/GrapplingHook.hpp"
 #include "physics/PhysicsSystem.hpp"
@@ -61,7 +63,7 @@ entt::entity maybe_hookable_box(entt::registry &registry, glm::vec2 position,
 }
 }  // namespace
 
-Game::Game() : collectables(&asset_manager) {
+Game::Game() : collectables(&asset_manager), projectileSystem(&asset_manager) {
     // Load assets
     // TODO: A game/level should read its required assets from some file and
     // load those as appropriate.
@@ -130,12 +132,21 @@ void Game::update(float dt) {
                                              player_transform.position);
         grapple_transform.rotation = -glm::atan(direction.y, direction.x);
     }
+    auto &health = registry.get<HealthComponent>(player_.entity);
+    if (health.health <= 0) {
+        registry.remove<RigidBodyComponent>(player_.entity);
+        registry.remove<RenderComponent>(player_.entity);
+        if (registry.all_of<ColliderComponent>(player_.entity)) {
+            registry.remove<ColliderComponent>(player_.entity);
+        }
+    }
 
     // System updates
     physics.update(dt, registry);
     collisions.update(dt, registry);
     camera_system->update(dt, registry);
     collectables.update(dt, registry, player_.entity);
+    projectileSystem.update(dt, registry, player_.entity);
 }
 
 void Game::render(glm::uvec2 drawable_size) {
@@ -195,6 +206,8 @@ void Game::load_assets() {
     asset_manager.load_sound(
         "guitar_loop_music",
         hookline::data_path("../assets/sounds/guitar_loop_music.opus"));
+    asset_manager.load_sound(
+        "retro_hurt", hookline::data_path("../assets/sounds/retro_hurt.opus"));
 }
 
 void Game::setup_player() {
@@ -210,6 +223,7 @@ void Game::setup_player() {
                                       RenderComponent::from_vertices_color(
                                           hookline::get_basic_shape_debug()));
     registry.emplace<InputComponent>(player);
+    registry.emplace<HealthComponent>(player, 10);
     player_.entity = player;
 }
 
@@ -231,7 +245,7 @@ void Game::setup_map() {
 
     // Create a few immovable boxes somewhere
     {
-        for (size_t i = 0; i < 10; ++i) {
+        for (size_t i = 0; i < 20; ++i) {
             glm::vec2 position = glm::linearRand(bottom_left, top_right);
             hookable_box(registry, position, glm::vec2{0.05f, 0.05f});
         }
