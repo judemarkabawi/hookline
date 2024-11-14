@@ -6,9 +6,9 @@ BasicMeshShader::BasicMeshShader() {
     m.program = gl_compile_program(
         // vertex shader
         "#version 330\n"
-        "in vec2 a_position;\n"
-        "in vec2 a_texture_coord;\n"
-        "in vec4 a_color;\n"
+        "layout(location = 0) in vec2 a_position;\n"
+        "layout(location = 1) in vec2 a_texture_coord;\n"
+        "layout(location = 2) in vec4 a_color;\n"
         "uniform vec2 u_position;\n"                 // from transform
         "uniform vec2 u_scale;\n"                    // from transform
         "uniform float u_rotation;\n"                // from transform

@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-#include "render/Vertex.hpp"
+#include "render/Mesh2D.hpp"
 #include "shader/BasicMeshShader.hpp"
 
 /**
@@ -29,27 +29,23 @@ class RenderComponent {
         const std::vector<glm::vec2>& vertices,
         const std::vector<glm::vec2>& tex_coords, GLuint texture);
 
-    ~RenderComponent();
+    ~RenderComponent() = default;
 
     // Cannot copy a render component
     RenderComponent(const RenderComponent& other) = delete;
     RenderComponent& operator=(const RenderComponent& other) = delete;
 
-    RenderComponent(RenderComponent&& other) noexcept;
-    RenderComponent& operator=(RenderComponent&& other) noexcept;
+    RenderComponent(RenderComponent&& other) noexcept = default;
+    RenderComponent& operator=(RenderComponent&& other) noexcept = default;
 
     void set_visible(bool visible);
 
     BasicMeshShader program_;
-    GLuint vao_ = 0;  // owning
-    GLuint vbo_ = 0;  // owning
-    std::vector<Vertex> verts_;
+    Mesh2D mesh_;
     GLuint texture_ = 0;  // non-owning
     bool visible_ = true;
     bool use_texture_ = false;
 
    private:
     RenderComponent() = default;
-    void setup();
-    void cleanup();
 };
