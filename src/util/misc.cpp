@@ -4,10 +4,6 @@
 #include <vector>
 
 #if defined(_WIN32)
-#include <Knownfolders.h>
-#include <Shlobj.h>
-#include <direct.h>
-#include <io.h>
 #include <windows.h>
 #elif defined(__APPLE__)
 #include <mach-o/dyld.h>
