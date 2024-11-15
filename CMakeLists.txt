@@ -68,8 +68,8 @@ else()
     # Compiler flags for Clang
     target_compile_options(${PROJECT_NAME} PRIVATE
         # Debug vs. Release compiler options
-        # $<$<CONFIG:Debug>:-g>
-        # $<$<CONFIG:Release>:-O3>
+        $<$<CONFIG:Debug>:-g>
+        $<$<CONFIG:Release>:-O3>
         # Always on compiler options
         -Wall -Wextra -Werror 
         # Uncomment if needed: -Wpedantic -fsanitize=address -fsanitize=undefined
