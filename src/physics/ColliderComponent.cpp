@@ -2,9 +2,6 @@
 
 #include <glm/glm.hpp>
 
-ColliderComponent::ColliderComponent(glm::vec2 size_) : size(size_) {};
-
-// Builders
 ColliderComponent &ColliderComponent::set_size(glm::vec2 size) {
     this->size = size;
     return *this;

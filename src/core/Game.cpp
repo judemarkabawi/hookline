@@ -15,11 +15,11 @@
 
 #include "constants.hpp"
 #include "core/InputComponent.hpp"
+#include "core/Level.hpp"
 #include "core/TransformComponent.hpp"
 #include "gameplay/HealthComponent.hpp"
 #include "gameplay/ProjectileSystem.hpp"
 #include "physics/ColliderComponent.hpp"
-#include "physics/ForceComponent.hpp"
 #include "physics/GrapplingHook.hpp"
 #include "physics/PhysicsSystem.hpp"
 #include "physics/RigidBodyComponent.hpp"
@@ -29,56 +29,11 @@
 #include "render/RenderComponent.hpp"
 #include "util/misc.hpp"
 
-namespace {
-/**
-    Helper to make a manually defined box on the map.
- */
-entt::entity hookable_box(entt::registry &registry, glm::vec2 position,
-                          glm::vec2 scale) {
-    auto box = registry.create();
-    registry.emplace<TransformComponent>(
-        box, TransformComponent(position, scale, 0.0f));
-    registry.emplace<RigidBodyComponent>(box);
-    registry.emplace<ColliderComponent>(
-        box, ColliderComponent(glm::vec2{1.0f, 1.0f}).set_can_move(false));
-    registry.emplace<RenderComponent>(
-        box, RenderComponent::from_vertices_color(
-                 hookline::get_basic_shape_debug(), {0.07, 0.11, 0.23, 1.0}));
-    return box;
-}
-
-/**
-    Helper to make a manually defined maybe-hookable box on the map.
- */
-entt::entity maybe_hookable_box(entt::registry &registry, glm::vec2 position,
-                                glm::vec2 scale, bool hookable = false) {
-    auto box = registry.create();
-    registry.emplace<TransformComponent>(
-        box, TransformComponent(position, scale, 0.0f));
-    registry.emplace<RigidBodyComponent>(box);
-    registry.emplace<ColliderComponent>(box,
-                                        ColliderComponent(glm::vec2{1.0f, 1.0f})
-                                            .set_can_move(false)
-                                            .set_hookable(hookable));
-    registry.emplace<RenderComponent>(box,
-                                      RenderComponent::from_vertices_color(
-                                          hookline::get_basic_shape_debug()));
-    return box;
-}
-}  // namespace
-
 Game::Game() : collectables(&asset_manager), projectileSystem(&asset_manager) {
-    // Load assets
-    // TODO: A game/level should read its required assets from some file and
-    // load those as appropriate.
-    load_assets();
-
-    // Player and attached camera setup
-    setup_player();
-    setup_camera();
-
-    // All hookable platforms, ground, and collectables
+    // Need to load level before camera
     setup_map();
+
+    setup_camera();
 
     // Play music
     Sound::loop(asset_manager.get_sound("guitar_loop_music"), 0.25);
@@ -203,34 +158,6 @@ bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
     return false;
 }
 
-void Game::load_assets() {
-    asset_manager.load_sound(
-        "item_pick_up",
-        hookline::data_path("../../assets/sounds/item_pick_up.opus"));
-    asset_manager.load_sound(
-        "guitar_loop_music",
-        hookline::data_path("../../assets/sounds/guitar_loop_music.opus"));
-    asset_manager.load_sound(
-        "retro_hurt", hookline::data_path("../../assets/sounds/retro_hurt.opus"));
-}
-
-void Game::setup_player() {
-    auto player = registry.create();
-    registry.emplace<TransformComponent>(
-        player, TransformComponent(glm::vec2{0.0f, 0.0f},
-                                   glm::vec2{0.05f, 0.05f}, 0.0f));
-    registry.emplace<RigidBodyComponent>(player);
-    registry.emplace<ForceComponent>(player);
-    registry.emplace<ColliderComponent>(
-        player, ColliderComponent(glm::vec2{1.0f, 1.0f}).set_hookable(false));
-    registry.emplace<RenderComponent>(player,
-                                      RenderComponent::from_vertices_color(
-                                          hookline::get_basic_shape_debug()));
-    registry.emplace<InputComponent>(player);
-    registry.emplace<HealthComponent>(player);
-    player_.entity = player;
-}
-
 void Game::setup_camera() {
     camera_system = std::make_unique<CameraSystem>(player_.entity);
     auto camera = registry.create();
@@ -242,38 +169,13 @@ void Game::setup_camera() {
 }
 
 void Game::setup_map() {
-    glm::vec2 bottom_left = {-2.0f, -2.0f};
-    glm::vec2 top_right = {2.0f, 3.0f};
-
-    srand(time(nullptr));
-
-    // Create a few immovable boxes somewhere
     {
-        for (size_t i = 0; i < 20; ++i) {
-            glm::vec2 position = glm::linearRand(bottom_left, top_right);
-            hookable_box(registry, position, glm::vec2{0.05f, 0.05f});
-        }
-    }
-
-    // Create a ground, side walls, and ceiling
-    {
-        maybe_hookable_box(registry, {0, -3.1f}, {3.0f, 0.05f});
-        maybe_hookable_box(registry, {-3.0f, 0.0f}, {0.05f, 3.0f});
-        maybe_hookable_box(registry, {3.0f, 0.0f}, {0.05f, 3.0f});
-        maybe_hookable_box(registry, {0, 3.1f}, {3.0f, 0.05f});
-    }
-
-    // Create grappling hook
-    {
-        grapple_entity = registry.create();
-        registry.emplace<TransformComponent>(
-            grapple_entity, TransformComponent(glm::vec2(0.0f, 0.0f),
-                                               glm::vec2{0.05f, 0.05f}, 0.0f));
-        registry.emplace<GrapplingHookComponent>(grapple_entity, grapple_entity,
-                                                 player_.entity);
-        registry.emplace<RenderComponent>(
-            grapple_entity, RenderComponent::from_vertices_color(
-                                hookline::get_basic_shape_debug()));
+        auto level = Level::load_json(
+            hookline::data_path("../../assets/levels/basic_level.json"));
+        asset_manager = std::move(level.assets);
+        registry = std::move(level.registry);
+        player_.entity = std::move(level.player);
+        grapple_entity = std::move(level.grapple);
     }
 
     // Spawn some collectables
