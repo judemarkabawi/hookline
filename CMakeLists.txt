@@ -39,6 +39,18 @@ target_include_directories(${PROJECT_NAME}
 )
 
 #=======================================================#
+# Output Directory
+#=======================================================#
+# Make a build/debug and build/release subfolders instead of just build
+
+if(UNIX)
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/debug
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/release
+    ) 
+endif()
+
+#=======================================================#
 # Compiler Flags
 #=======================================================#
 
@@ -56,8 +68,8 @@ else()
     # Compiler flags for Clang
     target_compile_options(${PROJECT_NAME} PRIVATE
         # Debug vs. Release compiler options
-        $<$<CONFIG:Debug>:-g>
-        $<$<CONFIG:Release>:-O3>
+        # $<$<CONFIG:Debug>:-g>
+        # $<$<CONFIG:Release>:-O3>
         # Always on compiler options
         -Wall -Wextra -Werror 
         # Uncomment if needed: -Wpedantic -fsanitize=address -fsanitize=undefined
