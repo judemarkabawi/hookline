@@ -1,5 +1,7 @@
 #pragma once
 
+#include <GL/glew.h>
+
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 
@@ -20,5 +22,22 @@ class RenderSystem {
    private:
     void render_background(glm::uvec2 drawable_size);
 
-    CyberpunkBackgroundShader background_shader_;
+    struct CyberpunkBackground {
+        CyberpunkBackgroundShader shader;
+        std::vector<glm::vec2> vertices;
+        GLuint vao;
+        GLuint vbo;
+
+        CyberpunkBackground();
+        ~CyberpunkBackground();
+
+        CyberpunkBackground(const CyberpunkBackground &other) = delete;
+        CyberpunkBackground &operator=(const CyberpunkBackground &other) =
+            delete;
+
+        CyberpunkBackground(const CyberpunkBackground &&other) = delete;
+        CyberpunkBackground &operator=(const CyberpunkBackground &&other) =
+            delete;
+    };
+    CyberpunkBackground background_;
 };

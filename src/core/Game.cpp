@@ -18,9 +18,11 @@
 #include "core/TransformComponent.hpp"
 #include "gameplay/HealthComponent.hpp"
 #include "gameplay/ProjectileSystem.hpp"
-#include "physics/Components.hpp"
+#include "physics/ColliderComponent.hpp"
+#include "physics/ForceComponent.hpp"
 #include "physics/GrapplingHook.hpp"
 #include "physics/PhysicsSystem.hpp"
+#include "physics/RigidBodyComponent.hpp"
 #include "physics/util.hpp"
 #include "render/CameraComponent.hpp"
 #include "render/CameraSystem.hpp"
@@ -38,7 +40,7 @@ entt::entity hookable_box(entt::registry &registry, glm::vec2 position,
         box, TransformComponent(position, scale, 0.0f));
     registry.emplace<RigidBodyComponent>(box);
     registry.emplace<ColliderComponent>(
-        box, ColliderComponent(glm::vec2{1.0f, 1.0f}, true, false, true));
+        box, ColliderComponent(glm::vec2{1.0f, 1.0f}).set_can_move(false));
     registry.emplace<RenderComponent>(
         box, RenderComponent::from_vertices_color(
                  hookline::get_basic_shape_debug(), {0.07, 0.11, 0.23, 1.0}));
@@ -54,8 +56,10 @@ entt::entity maybe_hookable_box(entt::registry &registry, glm::vec2 position,
     registry.emplace<TransformComponent>(
         box, TransformComponent(position, scale, 0.0f));
     registry.emplace<RigidBodyComponent>(box);
-    registry.emplace<ColliderComponent>(
-        box, ColliderComponent(glm::vec2{1.0f, 1.0f}, true, false, hookable));
+    registry.emplace<ColliderComponent>(box,
+                                        ColliderComponent(glm::vec2{1.0f, 1.0f})
+                                            .set_can_move(false)
+                                            .set_hookable(hookable));
     registry.emplace<RenderComponent>(box,
                                       RenderComponent::from_vertices_color(
                                           hookline::get_basic_shape_debug()));
@@ -202,12 +206,12 @@ bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
 void Game::load_assets() {
     asset_manager.load_sound(
         "item_pick_up",
-        hookline::data_path("../assets/sounds/item_pick_up.opus"));
+        hookline::data_path("../../assets/sounds/item_pick_up.opus"));
     asset_manager.load_sound(
         "guitar_loop_music",
-        hookline::data_path("../assets/sounds/guitar_loop_music.opus"));
+        hookline::data_path("../../assets/sounds/guitar_loop_music.opus"));
     asset_manager.load_sound(
-        "retro_hurt", hookline::data_path("../assets/sounds/retro_hurt.opus"));
+        "retro_hurt", hookline::data_path("../../assets/sounds/retro_hurt.opus"));
 }
 
 void Game::setup_player() {
@@ -217,13 +221,13 @@ void Game::setup_player() {
                                    glm::vec2{0.05f, 0.05f}, 0.0f));
     registry.emplace<RigidBodyComponent>(player);
     registry.emplace<ForceComponent>(player);
-    registry.emplace<ColliderComponent>(player, glm::vec2{1.0f, 1.0f}, true,
-                                        true, false);
+    registry.emplace<ColliderComponent>(
+        player, ColliderComponent(glm::vec2{1.0f, 1.0f}).set_hookable(false));
     registry.emplace<RenderComponent>(player,
                                       RenderComponent::from_vertices_color(
                                           hookline::get_basic_shape_debug()));
     registry.emplace<InputComponent>(player);
-    registry.emplace<HealthComponent>(player, 10);
+    registry.emplace<HealthComponent>(player);
     player_.entity = player;
 }
 

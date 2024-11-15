@@ -10,7 +10,6 @@
 
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
-#include <physics/Components.hpp>
 
 #include "core/AssetManager.hpp"
 #include "gameplay/CollectableSystem.hpp"

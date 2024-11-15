@@ -3,8 +3,9 @@
 #include "constants.hpp"
 #include "core/InputComponent.hpp"
 #include "core/TransformComponent.hpp"
-#include "physics/Components.hpp"
+#include "physics/ForceComponent.hpp"
 #include "physics/GrapplingHook.hpp"
+#include "physics/RigidBodyComponent.hpp"
 
 constexpr glm::vec2 g_accel() { return {0.0f, hookline::g}; }
 void PhysicsSystem::update(float dt, entt::registry& registry) {

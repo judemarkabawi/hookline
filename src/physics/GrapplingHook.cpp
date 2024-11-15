@@ -9,13 +9,13 @@ void GrapplingHookComponent::try_attach(glm::vec2 start_position,
         return;
     }
 
-    glm::vec2 hit_position;
     glm::vec2 direction = glm::normalize(target_position - start_position);
     std::vector<entt::entity> ignore_list = {user, self};
-    if (hookline::raycast(start_position, direction, max_length, registry,
-                          ignore_list, &hit_position)) {
+    auto maybe_hit = hookline::raycast(start_position, direction, max_length,
+                                       registry, ignore_list);
+    if (maybe_hit.has_value()) {
         attached = true;
-        attached_position = hit_position;
+        attached_position = maybe_hit.value();
     }
 }
 
