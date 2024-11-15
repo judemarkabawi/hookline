@@ -71,6 +71,7 @@ find_package(OpenGL REQUIRED)
 find_package(PNG REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(OpusFile CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     # entt
     EnTT::EnTT
@@ -85,6 +86,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
     # OpusFile
     OpusFile::opusfile
+    # nlohmann/json
+    nlohmann_json::nlohmann_json
 )
 # target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/vendor)
 

@@ -9,12 +9,10 @@
  * the position is at the center of the object
  */
 struct ColliderComponent {
-    glm::vec2 size;
+    glm::vec2 size = {1.0f, 1.0f};
     bool can_collide = true;
     bool can_move = true;
     bool hookable = true;
-
-    ColliderComponent(glm::vec2 size_);
 
     // Builders
     ColliderComponent &set_size(glm::vec2 size);

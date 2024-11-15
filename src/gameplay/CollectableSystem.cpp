@@ -3,7 +3,6 @@
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/random.hpp>
-#include <iostream>
 
 #include "CollectableComponent.hpp"
 #include "core/TransformComponent.hpp"
@@ -39,10 +38,6 @@ void CollectableSystem::spawn(entt::registry &registry, glm::vec2 position) {
         collectable,
         RenderComponent::from_vertices_color(hookline::get_basic_shape_debug(),
                                              {0.96, 0.48, 0.16, 1.0}));
-
-    std::cout << "Spawning collectable " << static_cast<uint32_t>(collectable)
-              << " with position " << "(" << position.x << ", " << position.y
-              << ")\n";
 }
 
 void CollectableSystem::spawn_random(entt::registry &registry) {
@@ -53,7 +48,6 @@ void CollectableSystem::spawn_random(entt::registry &registry) {
 
 void CollectableSystem::on_pickup(entt::registry &registry,
                                   entt::entity collectable) {
-    std::cout << "Picked up " << static_cast<uint32_t>(collectable) << "\n";
     registry.destroy(collectable);
     // spawn_random(registry);
     score += 1;
