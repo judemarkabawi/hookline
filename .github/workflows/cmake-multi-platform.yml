@@ -4,7 +4,7 @@ name: CMake on multiple platforms
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "CI" ]
   pull_request:
     branches: [ "main" ]
 
@@ -30,19 +30,65 @@ jobs:
           - os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             c_compiler: clang
             cpp_compiler: clang++
         exclude:
           - os: windows-latest
-            c_compiler: gcc
-          - os: windows-latest
             c_compiler: clang
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             c_compiler: cl
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Install Linux dependencies
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        DEBIAN_FRONTEND=noninteractive TZ=America/"New_York" sudo apt-get install -y \
+          build-essential \
+          git \
+          clang \
+          clang-tools \
+          cmake \
+          doxygen \
+          make \
+          ninja-build \
+          zip \
+          libxmu-dev \
+          libxi-dev \
+          libgl1-mesa-dev \
+          autoconf \
+          automake \
+          libtool \
+          pkg-config \
+          perl \
+          python3-jinja2 \
+          libwayland-dev \
+          libxkbcommon-dev \
+          libegl1-mesa-dev \
+          libx11-dev \
+          libxft-dev \
+          libxext-dev \
+          libibus-1.0-dev \
+          libglu1-mesa-dev \
+          libglu1-mesa \
+          libasound2-dev \
+          libpulse-dev \
+          libpipewire-0.3-dev
+
+    - name: Vcpkg - Setup
+      shell: bash
+      run: |
+        git submodule update --init --recursive
+        cd vcpkg
+        if [ "${{ runner.os }}" == "Linux" ]; then
+          ./bootstrap-vcpkg.sh
+        elif [ "${{ runner.os }}" == "Windows" ]; then
+          ./bootstrap-vcpkg.bat
+        fi
+        cd ..
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
@@ -51,7 +97,16 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
-    - name: Configure CMake
+    - name: Cache vcpkg built packages
+      id: cache-vcpkg
+      uses: actions/cache@v4
+      env:
+        cache-name: cache-vcpkg
+      with:
+        path: ${{ runner.os == 'Windows' && format('%LOCALAPPDATA%\vcpkg\archives') || '~/.cache/vcpkg/archives/' }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/vcpkg.json') }}
+
+    - name: CMake - Configure
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       run: >
@@ -61,6 +116,15 @@ jobs:
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
         -S ${{ github.workspace }}
 
-    - name: Build
+    - name: CMake - Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
-      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }} -- -j 10
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+    - name: CMake - Package
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --target package
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: hookline-${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.c_compiler }}
+        path: ${{ steps.strings.outputs.build-output-dir }}/hookline.zip

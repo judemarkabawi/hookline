@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.21)
 
 # Make sure to init vcpkg correctly before this
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake)
@@ -39,18 +39,6 @@ target_include_directories(${PROJECT_NAME}
 )
 
 #=======================================================#
-# Output Directory
-#=======================================================#
-# Make a build/debug and build/release subfolders instead of just build
-
-if(UNIX)
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/debug
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/release
-    ) 
-endif()
-
-#=======================================================#
 # Compiler Flags
 #=======================================================#
 
@@ -68,10 +56,8 @@ else()
     # Compiler flags for Clang
     target_compile_options(${PROJECT_NAME} PRIVATE
         # Debug vs. Release compiler options
-        $<$<CONFIG:Debug>:-g>
-        $<$<CONFIG:Release>:-O3>
-        # Always on compiler options
-        -Wall -Wextra -Werror 
+        $<$<CONFIG:Debug>:-g -Wall -Wextra -Werror>
+        $<$<CONFIG:Release>:-O3 -Wall -Wextra>
         # Uncomment if needed: -Wpedantic -fsanitize=address -fsanitize=undefined
     )
 endif()
@@ -92,7 +78,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     GLEW::GLEW
     # OpenGL
     OpenGL::GL
-    OpenGL::GLU
     # libpng
     PNG::PNG
     # SDL
@@ -110,3 +95,45 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 add_custom_target(format
     COMMAND clang-format -i ${SOURCES}
 )
+
+
+#=======================================================#
+# Packaging 
+#=======================================================#
+# Executable and shared libraries
+if (UNIX)
+    install(TARGETS ${PROJECT_NAME}
+            DESTINATION game/game/bin
+            RUNTIME_DEPENDENCIES
+            POST_EXCLUDE_REGEXES "libc\.so\..*"
+    )
+else()
+    install(TARGETS ${PROJECT_NAME}
+            DESTINATION game/game/bin
+            RUNTIME_DEPENDENCIES
+            PRE_INCLUDE_REGEXES
+                "glew32d\.dll"
+                "libpng16d\.dll"
+                "sdl2d\.dll"
+                "ogg\.dll"
+                "opus\.dll"
+                "msvcp140d\.dll"
+                "vcruntime140d\.dll"
+                "vcruntime140_1d\.dll"
+                "ucrtbased\.dll"
+                "zlibd1\.dll"
+            PRE_EXCLUDE_REGEXES ".*"
+    )
+endif()
+
+# Assets
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets
+        DESTINATION game/
+)
+# Make executable look for libraries in output bin directory
+set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN")
+
+# Package into zip file
+set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME})
+set(CPACK_GENERATOR "ZIP")
+include(CPack)
