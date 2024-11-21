@@ -63,12 +63,13 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
         // -- Vertex shader
         glUniform2f(program_.m.u_position_loc, transform.position.x,
                     transform.position.y);
-        glUniform2f(program_.m.u_scale_loc, transform.scale.x, transform.scale.y);
+        glUniform2f(program_.m.u_scale_loc, transform.scale.x,
+                    transform.scale.y);
         glUniform1f(program_.m.u_rotation_loc, transform.rotation);
-        glUniform2f(program_.m.u_camera_position_loc, camera_transform.position.x,
-                    camera_transform.position.y);
-        glUniform2f(program_.m.u_camera_viewport_size_loc, camera.viewport_size.x,
-                    camera.viewport_size.y);
+        glUniform2f(program_.m.u_camera_position_loc,
+                    camera_transform.position.x, camera_transform.position.y);
+        glUniform2f(program_.m.u_camera_viewport_size_loc,
+                    camera.viewport_size.x, camera.viewport_size.y);
         glUniform1f(program_.m.u_camera_pixels_per_unit_loc,
                     camera.pixels_per_unit);
         // -- Fragment shader

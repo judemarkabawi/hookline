@@ -69,7 +69,8 @@ GrappleBoxShader::GrappleBoxShader() {
         "   \n"
         "float extent = 0.25;   \n"
         "float z = max(extent * d, 0.0);    \n"
-        "vec3 lightRay = normalize(u_player_position - vec3(gl_FragCoord.xy, z)); \n"
+        "vec3 lightRay = normalize(u_player_position - vec3(gl_FragCoord.xy, "
+        "z)); \n"
         "   \n"
         "float top = float(uv.x < uv.y)*float(uv.x > -uv.y);    \n"
         "float left = float(uv.x < uv.y)*float(uv.x < -uv.y);   \n"
@@ -81,7 +82,8 @@ GrappleBoxShader::GrappleBoxShader() {
         "vec3 leftNorm = vec3(-0.5, 0.0, 0.5);  \n"
         "vec3 rightNorm = vec3(0.5, 0.0, 0.5);  \n"
         "   \n"
-        "vec3 norm = normalize(top*topNorm + bot*botNorm + left*leftNorm + right*rightNorm);    \n"
+        "vec3 norm = normalize(top*topNorm + bot*botNorm + left*leftNorm + "
+        "right*rightNorm);    \n"
         "   \n"
         "float lighting = max(0.0, dot(lightRay, norm));    \n"
         "lighting *= 0.7;   \n"
@@ -94,10 +96,12 @@ GrappleBoxShader::GrappleBoxShader() {
         "d = (0.4*d - 0.1*(length(uv)/0.5));    \n"
         "float angle = atan(uv.y, uv.x) + M_PI; \n"
         "   \n"
-        "float off = (sin(angle*1.0 + u_time)/80.0)*(cos(20.0*angle + 5.0 + 5.0*u_time)/2.0); \n"
+        "float off = (sin(angle*1.0 + u_time)/80.0)*(cos(20.0*angle + 5.0 + "
+        "5.0*u_time)/2.0); \n"
         "d+= off;   \n"
         "   \n"
-        "float off2 = (sin(3.5*angle*1.0 + u_time)/80.0)*(cos(12.0*angle + 5.0 + 5.0*u_time)/2.0);    \n"
+        "float off2 = (sin(3.5*angle*1.0 + u_time)/80.0)*(cos(12.0*angle + 5.0 "
+        "+ 5.0*u_time)/2.0);    \n"
         "b += off2; \n"
         "b = smoothstep(0.0, 0.2, b);   \n"
         "b = 0.1 / b;   \n"
@@ -162,7 +166,8 @@ GrappleBoxShader::GrappleBoxShader(GrappleBoxShader&& other) noexcept
     other.program = 0;
 }
 
-GrappleBoxShader& GrappleBoxShader::operator=(GrappleBoxShader&& other) noexcept {
+GrappleBoxShader& GrappleBoxShader::operator=(
+    GrappleBoxShader&& other) noexcept {
     if (this == &other) {
         return *this;
     }

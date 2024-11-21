@@ -3,14 +3,14 @@
 #include "util/gl_compile_program.hpp"
 
 CyberpunkBackgroundShaderNew::CyberpunkBackgroundShaderNew() {
-    program = gl_compile_program(
+    m.program = gl_compile_program(
         // vertex shader
         "#version 330 \n \
         in vec2 a_position; \n \
         void main() { \n \
            gl_Position = vec4(a_position, 0.0, 1.0); \n \
-        }\n", 
-        // ----- Fragment shader ----- 
+        }\n",
+        // ----- Fragment shader -----
         "#version 330 \n \
         uniform float u_time; \n \
         uniform vec2 u_drawable_size; \n \
@@ -56,6 +56,7 @@ CyberpunkBackgroundShaderNew::CyberpunkBackgroundShaderNew() {
             return o_s + ((x - i_s)/(i_e - i_s))*(o_e-o_s);  \n \
         } \n \
         void main() { \n \
+        float time = u_time / 1000.0; \n \
         // Normalized pixel coordinates (from 0 to 1) \n \
         vec2 uv = gl_FragCoord.xy / u_drawable_size; \n \
         float len = min(u_drawable_size.x, u_drawable_size.y); \n \
@@ -67,7 +68,7 @@ CyberpunkBackgroundShaderNew::CyberpunkBackgroundShaderNew() {
         float scale = 20.0; \n \
         float sqh = 0.6; \n \
          \n \
-        float warp = 0.0f;//0.3*cos(u_time*0.3)*((sin(u_time*10.0)+1.0)/2.0); \n \
+        float warp = 0.0f;//0.3*cos(time*0.3)*((sin(time*10.0)+1.0)/2.0); \n \
          \n \
         float off = sin(3.141592*(uv.x + 1.0)) + 1.0; \n \
         //v += 0.5*off*off*sin(3.141592*(uv.y - 0.5)); \n \
@@ -127,7 +128,7 @@ CyberpunkBackgroundShaderNew::CyberpunkBackgroundShaderNew() {
         float uv_mask = float(uv_hex_dist < 1.0); \n \
         float uv2_mask   = float(uv2_hex_dist < 1.0); \n \
          \n \
-        float t = 0.3*u_time; \n \
+        float t = 0.3*time; \n \
          \n \
         float uv_idx =  (dist(u_idx/sects, v_idx/sects, 2.*cos(2.*t), 2.*sin(2.*t))*0.5) + t ; \n \
         float uv2_idx = (dist(u2_idx/sects, v2_idx/sects, 2.*cos(2.*t+0.2), 2.*sin(2.*t+0.2))*0.5) + t; \n \
@@ -143,22 +144,19 @@ CyberpunkBackgroundShaderNew::CyberpunkBackgroundShaderNew() {
         FragColor = vec4(col, 1.0); \n \
         }\n");
 
-    a_position_loc = glGetAttribLocation(program, "a_position");
-    u_time_loc = glGetUniformLocation(program, "u_time");
-    u_drawable_size_loc = glGetUniformLocation(program, "u_drawable_size");
+    m.a_position_loc = glGetAttribLocation(m.program, "a_position");
+    m.u_time_loc = glGetUniformLocation(m.program, "u_time");
+    m.u_drawable_size_loc = glGetUniformLocation(m.program, "u_drawable_size");
 }
 
 CyberpunkBackgroundShaderNew::~CyberpunkBackgroundShaderNew() {
-    glDeleteProgram(program);
+    glDeleteProgram(m.program);
 }
 
 CyberpunkBackgroundShaderNew::CyberpunkBackgroundShaderNew(
     CyberpunkBackgroundShaderNew&& other) noexcept
-    : program(other.program),
-      a_position_loc(other.a_position_loc),
-      u_time_loc(other.u_time_loc),
-      u_drawable_size_loc(other.u_drawable_size_loc) {
-    other.program = 0;
+    : m(std::move(other.m)) {
+    other.m.program = 0;
 }
 
 CyberpunkBackgroundShaderNew& CyberpunkBackgroundShaderNew::operator=(
@@ -168,16 +166,13 @@ CyberpunkBackgroundShaderNew& CyberpunkBackgroundShaderNew::operator=(
     }
 
     // Delete current program
-    glDeleteProgram(program);
+    glDeleteProgram(m.program);
 
     // Move
-    program = other.program;
-    a_position_loc = other.a_position_loc;
-    u_time_loc = other.u_time_loc;
-    u_drawable_size_loc = other.u_drawable_size_loc;
+    m = std::move(other.m);
 
     // Reset other
-    other.program = 0;
+    other.m.program = 0;
 
     return *this;
 }

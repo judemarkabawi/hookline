@@ -9,7 +9,8 @@ class CyberpunkBackgroundShaderNew {
     ~CyberpunkBackgroundShaderNew();
 
     // Copy operators - can't copy a shader program
-    CyberpunkBackgroundShaderNew(const CyberpunkBackgroundShaderNew& other) = delete;
+    CyberpunkBackgroundShaderNew(const CyberpunkBackgroundShaderNew& other) =
+        delete;
     CyberpunkBackgroundShaderNew& operator=(
         const CyberpunkBackgroundShaderNew& other) = delete;
 
@@ -18,13 +19,15 @@ class CyberpunkBackgroundShaderNew {
     CyberpunkBackgroundShaderNew& operator=(
         CyberpunkBackgroundShaderNew&& other) noexcept;
 
-    GLuint program = 0;
+    struct {
+        GLuint program = 0;
 
-    // Attribute (per-vertex variable) locations
-    GLuint a_position_loc = 0;
+        // Attribute (per-vertex variable) locations
+        GLuint a_position_loc = 0;
 
-    // Uniform locations
-    // -- Fragment shader
-    GLuint u_time_loc = 0;
-    GLuint u_drawable_size_loc = 0;
+        // Uniform locations
+        // -- Fragment shader
+        GLuint u_time_loc = 0;
+        GLuint u_drawable_size_loc = 0;
+    } m;
 };

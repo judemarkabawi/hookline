@@ -54,7 +54,8 @@ BasicMeshShader::BasicMeshShader() {
     m.u_position_loc = glGetUniformLocation(m.program, "u_position");
     m.u_scale_loc = glGetUniformLocation(m.program, "u_scale");
     m.u_rotation_loc = glGetUniformLocation(m.program, "u_rotation");
-    m.u_camera_position_loc = glGetUniformLocation(m.program, "u_camera_position");
+    m.u_camera_position_loc =
+        glGetUniformLocation(m.program, "u_camera_position");
     m.u_camera_viewport_size_loc =
         glGetUniformLocation(m.program, "u_camera_viewport_size");
     m.u_camera_pixels_per_unit_loc =
