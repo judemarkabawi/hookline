@@ -56,7 +56,7 @@ else()
     # Compiler flags for Clang
     target_compile_options(${PROJECT_NAME} PRIVATE
         # Debug vs. Release compiler options
-        $<$<CONFIG:Debug>:-g -Wall -Wextra -Werror>
+        $<$<CONFIG:Debug>:-g -Wall -Wextra -Werror -Wpedantic>
         $<$<CONFIG:Release>:-O3 -Wall -Wextra>
         # Uncomment if needed: -Wpedantic -fsanitize=address -fsanitize=undefined
     )
