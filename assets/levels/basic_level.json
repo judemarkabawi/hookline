@@ -1,0 +1,133 @@
+{
+    "world_settings": {},
+    "player": {
+        "position": [
+            0.0,
+            0.0
+        ],
+        "scale": [
+            0.05,
+            0.05
+        ],
+        "color": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+        ],
+        "health": 50
+    },
+    "sounds": [
+        "item_pick_up.opus",
+        "guitar_loop_music.opus",
+        "retro_hurt.opus"
+    ],
+    "map": {
+        "objects": [
+            {
+                "__comment": "The ground",
+                "position": [
+                    0,
+                    -3.1
+                ],
+                "scale": [
+                    3.0,
+                    0.05
+                ],
+                "hookable": false,
+                "color": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
+            },
+            {
+                "position": [
+                    0.42,
+                    1.34
+                ],
+                "scale": [
+                    0.05,
+                    0.05
+                ],
+                "hookable": true,
+                "color": [
+                    0.07,
+                    0.11,
+                    0.23,
+                    1.0
+                ]
+            },
+            {
+                "position": [
+                    -1.56,
+                    2.02
+                ],
+                "scale": [
+                    0.05,
+                    0.05
+                ],
+                "hookable": true,
+                "color": [
+                    0.07,
+                    0.11,
+                    0.23,
+                    1.0
+                ]
+            },
+            {
+                "position": [
+                    0.78,
+                    -0.99
+                ],
+                "scale": [
+                    0.05,
+                    0.05
+                ],
+                "hookable": true,
+                "color": [
+                    0.07,
+                    0.11,
+                    0.23,
+                    1.0
+                ]
+            },
+            {
+                "position": [
+                    -0.94,
+                    1.67
+                ],
+                "scale": [
+                    0.05,
+                    0.05
+                ],
+                "hookable": true,
+                "color": [
+                    0.07,
+                    0.11,
+                    0.23,
+                    1.0
+                ]
+            },
+            {
+                "position": [
+                    1.32,
+                    0.45
+                ],
+                "scale": [
+                    0.05,
+                    0.05
+                ],
+                "hookable": true,
+                "color": [
+                    0.07,
+                    0.11,
+                    0.23,
+                    1.0
+                ]
+            }
+        ],
+        "projectile_spawns": {}
+    }
+}
