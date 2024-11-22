@@ -1,5 +1,6 @@
 #include "Level.hpp"
 
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -102,7 +103,7 @@ void load_sounds(const json &data, Level &level) {
         std::filesystem::path sound_path = sound;
         std::filesystem::path file_path = sound_assets_dir / sound_path;
         level.assets.load_sound(sound_path.stem().string(),
-                                hookline::data_path(file_path));
+                                hookline::data_path(file_path.string()));
     }
 }
 
