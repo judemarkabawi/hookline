@@ -3,7 +3,7 @@
 #include "util/gl_compile_program.hpp"
 
 BasicMeshShader::BasicMeshShader() {
-    program = gl_compile_program(
+    m.program = gl_compile_program(
         // vertex shader
         "#version 330\n"
         "in vec2 a_position;\n"
@@ -48,38 +48,27 @@ BasicMeshShader::BasicMeshShader() {
         "   }\n"
         "}\n");
 
-    a_position_loc = glGetAttribLocation(program, "a_position");
-    a_texture_coord_loc = glGetAttribLocation(program, "a_texture_coord");
-    a_color_loc = glGetAttribLocation(program, "a_color");
-    u_position_loc = glGetUniformLocation(program, "u_position");
-    u_scale_loc = glGetUniformLocation(program, "u_scale");
-    u_rotation_loc = glGetUniformLocation(program, "u_rotation");
-    u_camera_position_loc = glGetUniformLocation(program, "u_camera_position");
-    u_camera_viewport_size_loc =
-        glGetUniformLocation(program, "u_camera_viewport_size");
-    u_camera_pixels_per_unit_loc =
-        glGetUniformLocation(program, "u_camera_pixels_per_unit");
-    u_frag_texture_loc = glGetUniformLocation(program, "u_frag_texture");
-    u_frag_use_texture_loc =
-        glGetUniformLocation(program, "u_frag_use_texture");
+    m.a_position_loc = glGetAttribLocation(m.program, "a_position");
+    m.a_texture_coord_loc = glGetAttribLocation(m.program, "a_texture_coord");
+    m.a_color_loc = glGetAttribLocation(m.program, "a_color");
+    m.u_position_loc = glGetUniformLocation(m.program, "u_position");
+    m.u_scale_loc = glGetUniformLocation(m.program, "u_scale");
+    m.u_rotation_loc = glGetUniformLocation(m.program, "u_rotation");
+    m.u_camera_position_loc = glGetUniformLocation(m.program, "u_camera_position");
+    m.u_camera_viewport_size_loc =
+        glGetUniformLocation(m.program, "u_camera_viewport_size");
+    m.u_camera_pixels_per_unit_loc =
+        glGetUniformLocation(m.program, "u_camera_pixels_per_unit");
+    m.u_frag_texture_loc = glGetUniformLocation(m.program, "u_frag_texture");
+    m.u_frag_use_texture_loc =
+        glGetUniformLocation(m.program, "u_frag_use_texture");
 }
 
-BasicMeshShader::~BasicMeshShader() { glDeleteProgram(program); }
+BasicMeshShader::~BasicMeshShader() { glDeleteProgram(m.program); }
 
 BasicMeshShader::BasicMeshShader(BasicMeshShader&& other) noexcept
-    : program(other.program),
-      a_position_loc(other.a_position_loc),
-      a_texture_coord_loc(other.a_texture_coord_loc),
-      a_color_loc(other.a_color_loc),
-      u_position_loc(other.u_position_loc),
-      u_scale_loc(other.u_scale_loc),
-      u_rotation_loc(other.u_rotation_loc),
-      u_camera_position_loc(other.u_camera_position_loc),
-      u_camera_viewport_size_loc(other.u_camera_viewport_size_loc),
-      u_camera_pixels_per_unit_loc(other.u_camera_pixels_per_unit_loc),
-      u_frag_texture_loc(other.u_frag_texture_loc),
-      u_frag_use_texture_loc(other.u_frag_use_texture_loc) {
-    other.program = 0;
+    : m(other.m) {
+    other.m.program = 0;
 }
 
 BasicMeshShader& BasicMeshShader::operator=(BasicMeshShader&& other) noexcept {
@@ -88,24 +77,13 @@ BasicMeshShader& BasicMeshShader::operator=(BasicMeshShader&& other) noexcept {
     }
 
     // Delete current program
-    glDeleteProgram(program);
+    glDeleteProgram(m.program);
 
     // Move from other
-    program = other.program;
-    a_position_loc = other.a_position_loc;
-    a_texture_coord_loc = other.a_texture_coord_loc;
-    a_color_loc = other.a_color_loc;
-    u_position_loc = other.u_position_loc;
-    u_scale_loc = other.u_scale_loc;
-    u_rotation_loc = other.u_rotation_loc;
-    u_camera_position_loc = other.u_camera_position_loc;
-    u_camera_viewport_size_loc = other.u_camera_viewport_size_loc;
-    u_camera_pixels_per_unit_loc = other.u_camera_pixels_per_unit_loc;
-    u_frag_texture_loc = other.u_frag_texture_loc;
-    u_frag_use_texture_loc = other.u_frag_use_texture_loc;
+    m = std::move(other.m);
 
     // Reset other
-    other.program = 0;
+    other.m.program = 0;
 
     return *this;
 }
