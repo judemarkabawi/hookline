@@ -127,6 +127,9 @@ bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
         } else if (event.key.keysym.sym == SDLK_s) {
             player_.down.pressed = true;
             return true;
+        } else if (event.key.keysym.sym == SDLK_SPACE) {
+            auto &grapple = registry.get<GrapplingHookComponent>(grapple_entity);
+            grapple.hold(registry);
         }
     } else if (event.type == SDL_KEYUP) {
         if (event.key.keysym.sym == SDLK_a) {
@@ -141,6 +144,9 @@ bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
         } else if (event.key.keysym.sym == SDLK_s) {
             player_.down.pressed = false;
             return true;
+        } else if (event.key.keysym.sym == SDLK_SPACE) {
+            auto &grapple = registry.get<GrapplingHookComponent>(grapple_entity);
+            grapple.unhold();
         }
     } else if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button.button == SDL_BUTTON_LEFT) {
@@ -154,7 +160,7 @@ bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
         if (event.button.button == SDL_BUTTON_LEFT) {
             player_.mouse.pressed = false;
         }
-    }
+    } 
     return false;
 }
 
