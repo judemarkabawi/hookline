@@ -211,7 +211,8 @@ void Game::load_assets() {
         "guitar_loop_music",
         hookline::data_path("../../assets/sounds/guitar_loop_music.opus"));
     asset_manager.load_sound(
-        "retro_hurt", hookline::data_path("../../assets/sounds/retro_hurt.opus"));
+        "retro_hurt",
+        hookline::data_path("../../assets/sounds/retro_hurt.opus"));
 }
 
 void Game::setup_player() {

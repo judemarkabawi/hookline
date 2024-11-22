@@ -41,9 +41,8 @@ CyberpunkBackgroundShader::~CyberpunkBackgroundShader() {
 }
 
 CyberpunkBackgroundShader::CyberpunkBackgroundShader(
-    CyberpunkBackgroundShader&& other) noexcept {
-    m = std::move(other.m);
-
+    CyberpunkBackgroundShader&& other) noexcept
+    : m(std::move(other.m)) {
     other.m.program = 0;
 }
 
