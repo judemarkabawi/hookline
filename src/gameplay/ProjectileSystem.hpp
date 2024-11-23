@@ -14,7 +14,8 @@ class ProjectileSystem {
     void spawn_spray_projectile(glm::vec2 origin, entt::registry &registry);
 
     explicit ProjectileSystem() = default;
-    explicit ProjectileSystem(AssetManager *asset_manager) : asset_manager_(asset_manager) {};
+    explicit ProjectileSystem(AssetManager *asset_manager)
+        : asset_manager_(asset_manager) {};
 
    private:
     bool check_collision(const glm::vec2 &projectile_pos,

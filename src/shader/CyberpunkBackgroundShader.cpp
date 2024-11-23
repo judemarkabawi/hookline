@@ -3,7 +3,7 @@
 #include "util/gl_compile_program.hpp"
 
 CyberpunkBackgroundShader::CyberpunkBackgroundShader() {
-    program = gl_compile_program(
+    m.program = gl_compile_program(
         // vertex shader
         "#version 330\n"
         "in vec2 a_position;\n"
@@ -31,22 +31,19 @@ CyberpunkBackgroundShader::CyberpunkBackgroundShader() {
         "   FragColor = result_color;\n"
         "}\n");
 
-    a_position_loc = glGetAttribLocation(program, "a_position");
-    u_time_loc = glGetUniformLocation(program, "u_time");
-    u_drawable_size_loc = glGetUniformLocation(program, "u_drawable_size");
+    m.a_position_loc = glGetAttribLocation(m.program, "a_position");
+    m.u_time_loc = glGetUniformLocation(m.program, "u_time");
+    m.u_drawable_size_loc = glGetUniformLocation(m.program, "u_drawable_size");
 }
 
 CyberpunkBackgroundShader::~CyberpunkBackgroundShader() {
-    glDeleteProgram(program);
+    glDeleteProgram(m.program);
 }
 
 CyberpunkBackgroundShader::CyberpunkBackgroundShader(
     CyberpunkBackgroundShader&& other) noexcept
-    : program(other.program),
-      a_position_loc(other.a_position_loc),
-      u_time_loc(other.u_time_loc),
-      u_drawable_size_loc(other.u_drawable_size_loc) {
-    other.program = 0;
+    : m(std::move(other.m)) {
+    other.m.program = 0;
 }
 
 CyberpunkBackgroundShader& CyberpunkBackgroundShader::operator=(
@@ -56,16 +53,13 @@ CyberpunkBackgroundShader& CyberpunkBackgroundShader::operator=(
     }
 
     // Delete current program
-    glDeleteProgram(program);
+    glDeleteProgram(m.program);
 
     // Move
-    program = other.program;
-    a_position_loc = other.a_position_loc;
-    u_time_loc = other.u_time_loc;
-    u_drawable_size_loc = other.u_drawable_size_loc;
+    m = std::move(other.m);
 
     // Reset other
-    other.program = 0;
+    other.m.program = 0;
 
     return *this;
 }

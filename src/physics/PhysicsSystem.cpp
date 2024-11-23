@@ -3,21 +3,28 @@
 #include "constants.hpp"
 #include "core/InputComponent.hpp"
 #include "core/TransformComponent.hpp"
-#include "physics/Components.hpp"
+#include "physics/ForceComponent.hpp"
 #include "physics/GrapplingHook.hpp"
+#include "physics/RigidBodyComponent.hpp"
 
 constexpr glm::vec2 g_accel() { return {0.0f, hookline::g}; }
 void PhysicsSystem::update(float dt, entt::registry& registry) {
     /* Grappling hook physics */
     for (auto [_, grapple] : registry.view<GrapplingHookComponent>().each()) {
         if (grapple.attached) {
-            auto [player_transform, player_forces] =
-                registry.get<TransformComponent, ForceComponent>(grapple.user);
+            auto [player_transform, player_forces, player_rigidBody] =
+                registry.get<TransformComponent, ForceComponent, RigidBodyComponent>(grapple.user);
 
             // Add pulling force
             glm::vec2 grapple_direction = glm::normalize(
                 grapple.attached_position - player_transform.position);
-            player_forces.add_force(grapple_direction * grapple.pull_force);
+            if (grapple.held) {
+                float cosTheta = -grapple_direction.y;
+                float tension = player_rigidBody.mass * hookline::g / cosTheta;
+                player_forces.add_force(grapple_direction * tension);
+            }
+            else if (grapple.attached)
+                player_forces.add_force(grapple_direction * grapple.pull_force);
 
             // Deactive grapple when close
             if (glm::distance(player_transform.position,

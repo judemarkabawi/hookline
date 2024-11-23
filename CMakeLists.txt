@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.21)
 
 # Make sure to init vcpkg correctly before this
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake)
@@ -56,10 +56,8 @@ else()
     # Compiler flags for Clang
     target_compile_options(${PROJECT_NAME} PRIVATE
         # Debug vs. Release compiler options
-        $<$<CONFIG:Debug>:-g>
-        $<$<CONFIG:Release>:-O3>
-        # Always on compiler options
-        -Wall -Wextra -Werror 
+        $<$<CONFIG:Debug>:-g -Wall -Wextra -Werror -Wpedantic>
+        $<$<CONFIG:Release>:-O3 -Wall -Wextra>
         # Uncomment if needed: -Wpedantic -fsanitize=address -fsanitize=undefined
     )
 endif()
@@ -73,6 +71,7 @@ find_package(OpenGL REQUIRED)
 find_package(PNG REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(OpusFile CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     # entt
     EnTT::EnTT
@@ -80,7 +79,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     GLEW::GLEW
     # OpenGL
     OpenGL::GL
-    OpenGL::GLU
     # libpng
     PNG::PNG
     # SDL
@@ -88,6 +86,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
     # OpusFile
     OpusFile::opusfile
+    # nlohmann/json
+    nlohmann_json::nlohmann_json
 )
 # target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/vendor)
 
@@ -98,3 +98,45 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 add_custom_target(format
     COMMAND clang-format -i ${SOURCES}
 )
+
+
+#=======================================================#
+# Packaging 
+#=======================================================#
+# Executable and shared libraries
+if (UNIX)
+    install(TARGETS ${PROJECT_NAME}
+            DESTINATION game/game/bin
+            RUNTIME_DEPENDENCIES
+            POST_EXCLUDE_REGEXES "libc\.so\..*"
+    )
+else()
+    install(TARGETS ${PROJECT_NAME}
+            DESTINATION game/game/bin
+            RUNTIME_DEPENDENCIES
+            PRE_INCLUDE_REGEXES
+                "glew32d\.dll"
+                "libpng16d\.dll"
+                "sdl2d\.dll"
+                "ogg\.dll"
+                "opus\.dll"
+                "msvcp140d\.dll"
+                "vcruntime140d\.dll"
+                "vcruntime140_1d\.dll"
+                "ucrtbased\.dll"
+                "zlibd1\.dll"
+            PRE_EXCLUDE_REGEXES ".*"
+    )
+endif()
+
+# Assets
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets
+        DESTINATION game/
+)
+# Make executable look for libraries in output bin directory
+set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "$ORIGIN")
+
+# Package into zip file
+set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME})
+set(CPACK_GENERATOR "ZIP")
+include(CPack)

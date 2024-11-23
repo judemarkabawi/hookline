@@ -18,13 +18,15 @@ class CyberpunkBackgroundShader {
     CyberpunkBackgroundShader& operator=(
         CyberpunkBackgroundShader&& other) noexcept;
 
-    GLuint program = 0;
+    struct {
+        GLuint program = 0;
 
-    // Attribute (per-vertex variable) locations
-    GLuint a_position_loc = 0;
+        // Attribute (per-vertex variable) locations
+        GLuint a_position_loc = 0;
 
-    // Uniform locations
-    // -- Fragment shader
-    GLuint u_time_loc = 0;
-    GLuint u_drawable_size_loc = 0;
+        // Uniform locations
+        // -- Fragment shader
+        GLuint u_time_loc = 0;
+        GLuint u_drawable_size_loc = 0;
+    } m;
 };

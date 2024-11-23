@@ -10,7 +10,6 @@
 
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
-#include <physics/Components.hpp>
 
 #include "core/AssetManager.hpp"
 #include "gameplay/CollectableSystem.hpp"
@@ -22,12 +21,6 @@
 
 /**
  * Main Game class
- *
- * entt is the Entity-Component-System library we're using, any new
- * objects/things need to be made as entities with components attached to them.
- * Right now there's no spatial Scene data structure yet, we can do that soon.
- * TransformComponents in every entity and then iterating over entt views are
- * our implicit scene right now.
  */
 class Game {
    public:
@@ -61,8 +54,6 @@ class Game {
     entt::registry registry;
 
    private:
-    void load_assets();
-    void setup_player();
     void setup_camera();
     void setup_map();
 };
