@@ -1,3 +1,4 @@
+
 #include "Level.hpp"
 
 #include <filesystem>
@@ -34,9 +35,13 @@ entt::entity create_box(entt::registry &registry, glm::vec2 position,
     registry.emplace<RigidBodyComponent>(box);
     registry.emplace<ColliderComponent>(
         box, ColliderComponent().set_can_move(false).set_hookable(hookable).set_breakable(breakable).set_damaging(damaging));
+     RenderComponent::RenderType type = RenderComponent::RenderType::BASE;
+    if(hookable) {
+        type = RenderComponent::RenderType::GRAPPLE_POINT;
+    }
     registry.emplace<RenderComponent>(
-        box, RenderComponent::from_vertices_color(
-                 hookline::get_basic_shape_debug(), color));
+        box, RenderComponent::from_vertices_color_tex(
+                 hookline::get_basic_shape_debug(), color, hookline::get_basic_uvs_debug(), type));
     return box;
 }
 

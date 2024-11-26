@@ -1,5 +1,5 @@
 /**
- * @file BasicMeshShader.hpp
+ * @file CollectibleShader.hpp
  *
  * GL Shader program for 2D meshes with per-vertex color, or a single texture.
  */
@@ -9,17 +9,17 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
-struct GrappleBoxShader {
-    GrappleBoxShader();
-    ~GrappleBoxShader();
+struct CollectibleShader {
+    CollectibleShader();
+    ~CollectibleShader();
 
     // Cannot copy a shader program
-    GrappleBoxShader(const GrappleBoxShader& other) = delete;
-    GrappleBoxShader& operator=(const GrappleBoxShader& other) = delete;
+    CollectibleShader(const CollectibleShader& other) = delete;
+    CollectibleShader& operator=(const CollectibleShader& other) = delete;
 
-    GrappleBoxShader(GrappleBoxShader&& other) noexcept;
+    CollectibleShader(CollectibleShader&& other) noexcept;
 
-    GrappleBoxShader& operator=(GrappleBoxShader&& other) noexcept;
+    CollectibleShader& operator=(CollectibleShader&& other) noexcept;
 
     struct {
         GLuint program = 0;
@@ -36,15 +36,14 @@ struct GrappleBoxShader {
         GLuint u_camera_position_loc = 0;
         GLuint u_camera_viewport_size_loc = 0;
         GLuint u_camera_pixels_per_unit_loc = 0;
-        GLuint u_player_position_loc = 0;
         //   -- Fragment shader
-        GLuint u_frag_texture_loc = 0;
-        GLuint u_frag_use_texture_loc = 0;
         GLuint u_time_loc = 0;
+        GLuint u_drawable_size_loc = 0;
+        GLuint u_size_ratio_loc = 0;
     } m;
 
     //call after binding vertex arrays
     void updateUniforms(glm::vec2 user_pos, glm::vec2 u_scale, float u_rotation, 
                         glm::vec2 camera_pos, glm::vec2 camera_viewport_size, float camera_pixels_per_unit,
-                        int frag_use_texture, GLuint texture, float u_time);
+                        glm::vec2 drawable_size, float u_time, float size_ratio);
 };

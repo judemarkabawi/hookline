@@ -60,9 +60,14 @@ static std::string get_exe_path() {
 }  // namespace
 
 namespace hookline {
-std::vector<glm::vec2> get_basic_shape_debug() {
-    return {/*BL*/ {-1.0, -1.0}, /*BR*/ {1.0, -1.0},
-            /*TL*/ {-1.0, 1.0}, /*TR*/ {1.0, 1.0}};
+std::vector<glm::vec2> get_basic_shape_debug(float scale) {
+    return {/*BL*/ {-scale, -scale}, /*BR*/ {scale, -scale},
+            /*TL*/ {-scale, scale}, /*TR*/ {scale, scale}};
+}
+
+std::vector<glm::vec2> get_basic_uvs_debug() {
+    return {/*BL*/ {0.0, 0.0}, /*BR*/ {1.0, 0.0},
+            /*TL*/ {0.0, 1.0}, /*TR*/ {1.0, 1.0}};
 }
 
 std::string data_path(std::string const &suffix) {

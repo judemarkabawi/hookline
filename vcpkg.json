@@ -8,6 +8,8 @@
     "opengl",
     "sdl2",
     "opusfile",
-    "nlohmann-json"
+    "nlohmann-json",
+    "harfbuzz",
+    "freetype"
   ]
 }

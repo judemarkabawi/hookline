@@ -5,6 +5,7 @@
  */
 
 #include "Game.hpp"
+//#include <iostream>
 
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
@@ -17,6 +18,7 @@
 #include "core/InputComponent.hpp"
 #include "core/Level.hpp"
 #include "core/TransformComponent.hpp"
+#include "core/text/TextComponent.hpp"
 #include "gameplay/HealthComponent.hpp"
 #include "gameplay/ProjectileSystem.hpp"
 #include "physics/ColliderComponent.hpp"
@@ -40,6 +42,11 @@ Game::Game() : collectables(&asset_manager), projectileSystem(&asset_manager) {
 }
 
 void Game::update(float dt) {
+    if (mode == Mode::StartMenu) {
+        start_menu_update(dt);
+        return;
+    }
+
     /* -- PLAYER INPUT & GRAPPLE -- */
     // TODO: Put input into a separate input component and handle this movement
     auto &inputs = registry.get<InputComponent>(player_.entity);
@@ -112,11 +119,20 @@ void Game::update(float dt) {
 }
 
 void Game::render(glm::uvec2 drawable_size) {
+    if (mode == Mode::StartMenu) {
+        start_menu_render(drawable_size);
+        return;
+    }
+
     // Render scene
     rendering.render(drawable_size, registry, camera_entity);
 }
 
 bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
+    if (mode == Mode::StartMenu) {
+        return start_menu_handle_event(event, drawable_size);
+    }
+
     if (event.type == SDL_KEYDOWN) {
         if (event.key.keysym.sym == SDLK_a) {
             player_.left.pressed = true;
@@ -131,7 +147,8 @@ bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
             player_.down.pressed = true;
             return true;
         } else if (event.key.keysym.sym == SDLK_SPACE) {
-            auto &grapple = registry.get<GrapplingHookComponent>(grapple_entity);
+            auto &grapple =
+                registry.get<GrapplingHookComponent>(grapple_entity);
             grapple.hold(registry);
         }
     } else if (event.type == SDL_KEYUP) {
@@ -148,7 +165,8 @@ bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
             player_.down.pressed = false;
             return true;
         } else if (event.key.keysym.sym == SDLK_SPACE) {
-            auto &grapple = registry.get<GrapplingHookComponent>(grapple_entity);
+            auto &grapple =
+                registry.get<GrapplingHookComponent>(grapple_entity);
             grapple.unhold();
         }
     } else if (event.type == SDL_MOUSEBUTTONDOWN) {
@@ -163,7 +181,7 @@ bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
         if (event.button.button == SDL_BUTTON_LEFT) {
             player_.mouse.pressed = false;
         }
-    } 
+    }
     return false;
 }
 
@@ -185,6 +203,9 @@ void Game::setup_map() {
         registry = std::move(level.registry);
         player_.entity = std::move(level.player);
         grapple_entity = std::move(level.grapple);
+
+        //load bacgrounds shader
+        rendering.load_background_images(&asset_manager);
     }
 
     // Spawn some collectables
@@ -195,4 +216,45 @@ void Game::setup_map() {
         }
         */
     }
+}
+
+void Game::start_menu_update(float dt) {
+    (void)dt;
+
+    static bool initialized = false;
+    if (initialized) {
+        return;
+    }
+
+    initialized = true;
+    entt::entity title = registry.create();
+    start_menu_registry.emplace<TextComponent>(
+        title, TextComponent::from_text("Hookline", {-0.35, 0.5}, 5.0f));
+
+    entt::entity play_button = registry.create();
+    start_menu_registry.emplace<TextComponent>(
+        play_button,
+        TextComponent::from_text("Click anywhere to play", {-0.2, -0.1}, 1.0f));
+}
+
+void Game::start_menu_render(glm::uvec2 drawable_size) {
+    glClearColor(0, 0, 0, 0);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    start_menu_rendering.render_menu_background(drawable_size);
+
+    start_menu_rendering.render_text(drawable_size, start_menu_registry);
+}
+
+bool Game::start_menu_handle_event(SDL_Event const &event,
+                                   glm::uvec2 drawable_size) {
+    (void)drawable_size;
+
+    if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (event.button.button == SDL_BUTTON_LEFT) {
+            mode = Mode::Game;
+            return true;
+        }
+    }
+    return false;
 }

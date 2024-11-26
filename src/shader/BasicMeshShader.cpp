@@ -6,9 +6,9 @@ BasicMeshShader::BasicMeshShader() {
     m.program = gl_compile_program(
         // vertex shader
         "#version 330\n"
-        "in vec2 a_position;\n"
-        "in vec2 a_texture_coord;\n"
-        "in vec4 a_color;\n"
+        "layout(location = 0) in vec2 a_position;\n"
+        "layout(location = 1) in vec2 a_texture_coord;\n"
+        "layout(location = 2) in vec4 a_color;\n"
         "uniform vec2 u_position;\n"                 // from transform
         "uniform vec2 u_scale;\n"                    // from transform
         "uniform float u_rotation;\n"                // from transform
@@ -47,7 +47,6 @@ BasicMeshShader::BasicMeshShader() {
         "       FragColor = color;\n"
         "   }\n"
         "}\n");
-
     m.a_position_loc = glGetAttribLocation(m.program, "a_position");
     m.a_texture_coord_loc = glGetAttribLocation(m.program, "a_texture_coord");
     m.a_color_loc = glGetAttribLocation(m.program, "a_color");
@@ -88,3 +87,31 @@ BasicMeshShader& BasicMeshShader::operator=(BasicMeshShader&& other) noexcept {
 
     return *this;
 }
+
+//assumed vertex buffer is updated already
+void BasicMeshShader::updateUniforms(glm::vec2 user_pos, glm::vec2 u_scale, float u_rotation, 
+                                    glm::vec2 camera_pos, glm::vec2 camera_viewport_size, float camera_pixels_per_unit,
+                                    int frag_use_texture = 0, GLuint texture = -1U) {
+            // Uniforms
+        // -- Vertex shader
+        glUniform2f(m.u_position_loc, user_pos.x,
+                    user_pos.y);
+        glUniform2f(m.u_scale_loc, u_scale.x,
+                    u_scale.y);
+        glUniform1f(m.u_rotation_loc, u_rotation);
+        glUniform2f(m.u_camera_position_loc,
+                    camera_pos.x, camera_pos.y);
+        glUniform2f(m.u_camera_viewport_size_loc,
+                    camera_viewport_size.x, camera_viewport_size.y);
+        glUniform1f(m.u_camera_pixels_per_unit_loc,
+                    camera_pixels_per_unit);
+        // -- Fragment shader
+        glUniform1i(m.u_frag_use_texture_loc, frag_use_texture);
+
+        // Texture
+        if (frag_use_texture) {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, texture);
+            glUniform1i(m.u_frag_texture_loc, 0);
+        }
+};

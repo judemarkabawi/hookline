@@ -1,20 +1,42 @@
 #include "RenderComponent.hpp"
 
+#include "render/Mesh2D.hpp"
+#include "render/Vertex.hpp"
+
 /**
- * Make a new RenderComponent using vertices and a (default) color.
+ * Make a new RenderComponent using vertices and a (default) color. Default type is BASE
  */
 RenderComponent RenderComponent::from_vertices_color(
-    const std::vector<glm::vec2>& vertices, glm::vec4 color) {
+    const std::vector<glm::vec2>& vertices, glm::vec4 color,
+            RenderType type) {
+    Mesh2D mesh = Mesh2D::from_verts_color(vertices, color);
+
     RenderComponent result;
-    for (glm::vec2 vertex_pos : vertices) {
-        Vertex vertex = {vertex_pos, glm::vec2{0.0f, 0.0f}, color};
-        result.verts_.push_back(vertex);
-    }
+    result.type = type;
+    result.mesh_ = std::move(mesh);
     result.visible_ = true;
     result.use_texture_ = false;
+    return result;
+}
 
-    result.setup();
+/**
+ * Make a new RenderComponent using vertices, (default) color, and tex_cords (but no texture). Default type is BASE
+ */
+RenderComponent RenderComponent::from_vertices_color_tex(
+    const std::vector<glm::vec2>& vertices, glm::vec4 color,
+            const std::vector<glm::vec2>& tex_coords,
+            RenderType type) {
+    assert(vertices.size() == tex_coords.size() &&
+           "RenderComponent: Cannot construct with different length vertices "
+           "and tex_coords");
+        
+    Mesh2D mesh = Mesh2D::from_verts_texture(vertices, tex_coords, color);
 
+    RenderComponent result;
+    result.type = type;
+    result.mesh_ = std::move(mesh);
+    result.visible_ = true;
+    result.use_texture_ = false;
     return result;
 }
 
@@ -23,72 +45,22 @@ RenderComponent RenderComponent::from_vertices_color(
  */
 RenderComponent RenderComponent::from_vertices_texture(
     const std::vector<glm::vec2>& vertices,
-    const std::vector<glm::vec2>& tex_coords, GLuint texture) {
+    const std::vector<glm::vec2>& tex_coords, GLuint texture,
+    RenderType type) {
     assert(vertices.size() == tex_coords.size() &&
            "RenderComponent: Cannot construct with different length vertices "
            "and tex_coords");
     assert(texture != 0 && "RenderComponent: Need a valid texture");
 
+    Mesh2D mesh = Mesh2D::from_verts_texture(vertices, tex_coords);
+
     RenderComponent result;
-    for (size_t i = 0; i < vertices.size(); ++i) {
-        Vertex vertex = {vertices[i], tex_coords[i], {0.0f, 0.0f, 0.0f, 1.0f}};
-        result.verts_.push_back(vertex);
-    }
+    result.type = type;
     result.texture_ = texture;
+    result.mesh_ = std::move(mesh);
     result.visible_ = true;
     result.use_texture_ = true;
-
-    result.setup();
-
     return result;
 }
 
-RenderComponent::~RenderComponent() { cleanup(); }
-
-RenderComponent::RenderComponent(RenderComponent&& other) noexcept
-    : program_(std::move(other.program_)),
-      vao_(other.vao_),
-      vbo_(other.vbo_),
-      verts_(std::move(other.verts_)),
-      texture_(other.texture_),
-      visible_(other.visible_),
-      use_texture_(other.use_texture_) {
-    other.vao_ = 0;
-    other.vbo_ = 0;
-}
-
-RenderComponent& RenderComponent::operator=(RenderComponent&& other) noexcept {
-    if (this == &other) {
-        return *this;
-    }
-
-    // Clean up current objects
-    cleanup();
-
-    // Move
-    program_ = std::move(other.program_);
-    vao_ = other.vao_;
-    vbo_ = other.vbo_;
-    verts_ = std::move(other.verts_);
-    texture_ = other.texture_;
-    visible_ = other.visible_;
-    use_texture_ = other.use_texture_;
-
-    // Reset other
-    other.vao_ = 0;
-    other.vbo_ = 0;
-
-    return *this;
-}
-
 void RenderComponent::set_visible(bool visible) { visible_ = visible; }
-
-void RenderComponent::setup() {
-    glGenVertexArrays(1, &vao_);
-    glGenBuffers(1, &vbo_);
-}
-
-void RenderComponent::cleanup() {
-    glDeleteVertexArrays(1, &vao_);
-    glDeleteBuffers(1, &vbo_);
-}

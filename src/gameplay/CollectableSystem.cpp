@@ -12,6 +12,7 @@
 #include "core/TransformComponent.hpp"
 #include "render/RenderComponent.hpp"
 #include "util/misc.hpp"
+#include "constants.hpp"
 
 CollectableSystem::CollectableSystem(AssetManager *asset_manager)
     : asset_manager_(asset_manager) {}
@@ -38,22 +39,24 @@ void CollectableSystem::spawn(entt::registry &registry, glm::vec2 position, Coll
         collectable,
         TransformComponent(position, glm::vec2{0.025f, 0.025f}, 0.0f));
     registry.emplace<CollectableComponent>(collectable, CollectableComponent{type});
+    std::vector<glm::vec2> points = hookline::get_basic_shape_debug(1.0 / hookline::collectible_glow_ratio);
     glm::vec4 color;
     switch (type) {
         case CollectableType::Feather:
-            color = {0.8f, 0.8f, 0.2f, 1.0f};  // Yellow for Feather
+            color = {0.96, 0.48, 0.16, 1.0};  // Orange for Feather
             break;
         case CollectableType::Potion:
             color = {0.2f, 0.8f, 0.2f, 1.0f};  // Green for Potion
             break;
         default:
-            color = {0.96, 0.48, 0.16, 1.0};  // Default Orange
+            color = {0.96, 0.48, 0.16, 1.0};  
             break;
     }
     registry.emplace<RenderComponent>(
         collectable,
-        RenderComponent::from_vertices_color(hookline::get_basic_shape_debug(),
-                                             color));
+        RenderComponent::from_vertices_color_tex(points, color, 
+               hookline::get_basic_uvs_debug(), RenderComponent::RenderType::COLLECTIBLE));
+
 }
 
 void CollectableSystem::spawn_random(entt::registry &registry) {
