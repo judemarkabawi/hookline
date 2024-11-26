@@ -4,8 +4,12 @@
 
 #include "util/load_save_png.hpp"
 
-void AssetManager::load_texture(const std::string &name,
-                                const std::string &filename) {
+//only need first 2 params, default is 2D tex, w vertical wrap and linear mipmap filtering
+GLuint AssetManager::load_texture(const std::string &name,
+                                const std::string &filename,
+                                const GLenum texType, 
+                                const GLint filterType,
+                                const GLint verticalWrap) {
     // Load image
     glm::uvec2 size;
     std::vector<glm::u8vec4> data;
@@ -13,19 +17,30 @@ void AssetManager::load_texture(const std::string &name,
 
     GLuint texture;
     glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindTexture(texType, texture);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+    if(verticalWrap == GL_REPEAT) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    } else if (GL_CLAMP) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    }
+    if(filterType == GL_LINEAR_MIPMAP_LINEAR) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    } else if (filterType == GL_NEAREST) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterType);
+    }
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, data.data());
-    glGenerateMipmap(GL_TEXTURE_2D);
+    if(filterType != GL_LINEAR_MIPMAP_LINEAR) glGenerateMipmap(GL_TEXTURE_2D);
 
     textures_[name] = texture;
+    return texture;
 }
 
 GLuint AssetManager::get_texture(const std::string &name) {

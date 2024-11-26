@@ -8,10 +8,11 @@
 
 #include "core/TransformComponent.hpp"
 #include "core/text/TextComponent.hpp"
+#include "core/AssetManager.hpp"
 #include "render/CameraComponent.hpp"
 #include "render/Mesh2D.hpp"
 #include "render/RenderComponent.hpp"
-#include "shader/CyberpunkBackgroundShader.hpp"
+#include "shader/CyberpunkBackgroundShaderFull.hpp"
 #include "util/misc.hpp"
 
 RenderSystem::RenderSystem() {
@@ -20,16 +21,17 @@ RenderSystem::RenderSystem() {
     glClearColor(0, 0, 0, 0);
 }
 
+
 void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
                           entt::entity camera_entity) {
     glClear(GL_COLOR_BUFFER_BIT);
-
-    render_background(drawable_size);
 
     // Update camera before rendering
     auto [camera_transform, camera] =
         registry.get<TransformComponent, CameraComponent>(camera_entity);
     camera.viewport_size = drawable_size;
+
+    render_background(drawable_size, camera_transform.position);
 
     auto view = registry.view<TransformComponent, RenderComponent>();
     // Render each renderable
@@ -100,12 +102,68 @@ RenderSystem::CyberpunkBackground::CyberpunkBackground() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void RenderSystem::load_background_images(AssetManager* manager) {
+        //load associated textures
+    background_.bg_emission = manager->load_texture("bg_emission", hookline::data_path("../assets/textures/bg_emission.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+    background_.bg_color = manager->load_texture("bg_color", hookline::data_path("../assets/textures/bg_color.png"), GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
+    background_.bg_normals = manager->load_texture("bg_normals", hookline::data_path("../assets/textures/bg_normals.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+
+    background_.mg_emission = manager->load_texture("bg_emission", hookline::data_path("../assets/textures/bg_emission.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+    background_.mg_color = manager->load_texture("bg_color", hookline::data_path("../assets/textures/bg_color.png"), GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
+    background_.mg_normals = manager->load_texture("bg_normals", hookline::data_path("../assets/textures/bg_normals.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+
+    background_.fg_emission = manager->load_texture("fg_emission", hookline::data_path("../assets/textures/fg_emission.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+    background_.fg_color = manager->load_texture("fg_color", hookline::data_path("../assets/textures/fg_color.png"), GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
+    background_.fg_normals = manager->load_texture("fg_normals", hookline::data_path("../assets/textures/fg_normals.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+
+}
+
+void RenderSystem::bind_textures() {
+    //assume program is already bound
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, background_.bg_emission);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, background_.bg_color);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, background_.bg_normals);
+
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, background_.mg_emission);
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, background_.mg_color);
+    glActiveTexture(GL_TEXTURE5);
+    glBindTexture(GL_TEXTURE_2D, background_.mg_normals);
+
+    glActiveTexture(GL_TEXTURE6);
+    glBindTexture(GL_TEXTURE_2D, background_.fg_emission);
+    glActiveTexture(GL_TEXTURE7);
+    glBindTexture(GL_TEXTURE_2D, background_.fg_color);
+    glActiveTexture(GL_TEXTURE8);
+    glBindTexture(GL_TEXTURE_2D, background_.fg_normals);
+
+    //glActiveTexture(GL_TEXTURE9);
+    //glBindTexture(GL_TEXTURE_CUBE_MAP, background_.bg_cube);
+}
+
+void RenderSystem::unbind_textures() {
+    //assume program is already bound
+    for(int i = 0; i < 9; i++) {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+    glActiveTexture(GL_TEXTURE0 + 9);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    //glActiveTexture(GL_TEXTURE9);
+    //glBindTexture(GL_TEXTURE_CUBE_MAP, background_.bg_cube);
+    glActiveTexture(GL_TEXTURE0);
+}
+
 RenderSystem::CyberpunkBackground::~CyberpunkBackground() {
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
 }
 
-void RenderSystem::render_background(glm::uvec2 drawable_size) {
+void RenderSystem::render_background(glm::uvec2 drawable_size, glm::vec2 camera_pos) {
     // Bind VAO
     glBindVertexArray(background_.vao);
 
@@ -119,13 +177,18 @@ void RenderSystem::render_background(glm::uvec2 drawable_size) {
     auto time_diff =
         duration_cast<milliseconds>(high_resolution_clock::now() - start_time);
     float time = time_diff.count();
-    glUniform1f(background_.shader.m.u_time_loc, time);
+    glUniform1f(background_.shader.m.u_time_loc, time/1000.0);
 
     glUniform2f(background_.shader.m.u_drawable_size_loc,
                 (float)drawable_size.x, (float)drawable_size.y);
+    glUniform2f(background_.shader.m.u_camera_pos,
+                (float)camera_pos.x, (float)camera_pos.y);
+
+    bind_textures();
 
     // Draw
     glDrawArrays(GL_TRIANGLE_STRIP, 0, background_.vertices.size());
+    glUseProgram(0); //unbind
 }
 
 /**

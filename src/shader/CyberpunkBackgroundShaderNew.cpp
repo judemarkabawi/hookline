@@ -58,11 +58,12 @@ CyberpunkBackgroundShaderNew::CyberpunkBackgroundShaderNew() {
         void main() { \n \
         float time = u_time / 1000.0; \n \
         // Normalized pixel coordinates (from 0 to 1) \n \
-        vec2 uv = gl_FragCoord.xy / u_drawable_size; \n \
+        vec2 fragCoord = gl_FragCoord*u_drawable_size.xy; \
+        vec2 uv = fragCoord.xy / u_drawable_size; \n \
         float len = min(u_drawable_size.x, u_drawable_size.y); \n \
-        float ud = gl_FragCoord.x/len; \n \
+        float ud = fragCoord.x/len; \n \
         float u = ((uv.x - 0.5)*2.0);//*(u_drawable_size.x/len); \n \
-        float v = gl_FragCoord.y/min(u_drawable_size.x, u_drawable_size.y); \n \
+        float v = fragCoord.y/min(u_drawable_size.x, u_drawable_size.y); \n \
         v = (v - 0.5); \n \
          \n \
         float scale = 20.0; \n \

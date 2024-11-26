@@ -5,6 +5,7 @@
  */
 
 #include "Game.hpp"
+//#include <iostream>
 
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
@@ -184,12 +185,17 @@ void Game::setup_camera() {
 
 void Game::setup_map() {
     {
+        //std::string s = hookline::data_path("../../assets/levels/basic_level.json");
+        //std::cout << s << std::endl;
         auto level = Level::load_json(
-            hookline::data_path("../../assets/levels/basic_level.json"));
+            hookline::data_path("../assets/levels/basic_level.json"));
         asset_manager = std::move(level.assets);
         registry = std::move(level.registry);
         player_.entity = std::move(level.player);
         grapple_entity = std::move(level.grapple);
+
+        //load bacgrounds shader
+        rendering.load_background_images(&asset_manager);
     }
 
     // Spawn some collectables
