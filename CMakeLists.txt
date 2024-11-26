@@ -132,6 +132,8 @@ else()
                 "vcruntime140_1d\.dll"
                 "ucrtbased\.dll"
                 "zlibd1\.dll"
+                "harfbuzz\.dll"
+                "freetyped\.dll"
             PRE_EXCLUDE_REGEXES ".*"
     )
 endif()
