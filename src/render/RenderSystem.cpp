@@ -1,18 +1,27 @@
 #include "RenderSystem.hpp"
 
 #include <chrono>
-#include <cstddef>
+#include <cstdlib>
 #include <entt/entt.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "core/TransformComponent.hpp"
+#include "core/text/TextComponent.hpp"
 #include "render/CameraComponent.hpp"
+#include "render/Mesh2D.hpp"
 #include "render/RenderComponent.hpp"
 #include "shader/CyberpunkBackgroundShader.hpp"
 #include "util/misc.hpp"
 
+RenderSystem::RenderSystem() {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glClearColor(0, 0, 0, 0);
+}
+
 void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
                           entt::entity camera_entity) {
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     render_background(drawable_size);
@@ -29,37 +38,16 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
             continue;
         }
 
-        GLuint vao_ = renderable.vao_;
-        GLuint vbo_ = renderable.vbo_;
-        const auto &verts_ = renderable.verts_;
+        const auto &verts_ = renderable.mesh_.verts;
         const auto &program_ = renderable.program_;
 
-        // Vertex data
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-        glBufferData(GL_ARRAY_BUFFER, verts_.size() * sizeof(Vertex),
-                     verts_.data(), GL_STATIC_DRAW);
-
         // Vertex attribute data
-        glBindVertexArray(vao_);
-        // -- Position
-        glVertexAttribPointer(program_.m.a_position_loc, 2, GL_FLOAT, GL_FALSE,
-                              sizeof(Vertex),
-                              (void *)offsetof(Vertex, position));
-        glEnableVertexAttribArray(program_.m.a_position_loc);
-        // -- Texture coordinate
-        glVertexAttribPointer(program_.m.a_texture_coord_loc, 2, GL_FLOAT,
-                              GL_FALSE, sizeof(Vertex),
-                              (void *)offsetof(Vertex, tex_coords));
-        glEnableVertexAttribArray(program_.m.a_texture_coord_loc);
-        // -- Color
-        glVertexAttribPointer(program_.m.a_color_loc, 4, GL_FLOAT, GL_FALSE,
-                              sizeof(Vertex), (void *)offsetof(Vertex, color));
-        glEnableVertexAttribArray(program_.m.a_color_loc);
+        glBindVertexArray(renderable.mesh_.vao);
 
         // Use program
         glUseProgram(program_.m.program);
 
-        // Set uniforms
+        // Uniforms
         // -- Vertex shader
         glUniform2f(program_.m.u_position_loc, transform.position.x,
                     transform.position.y);
@@ -84,11 +72,9 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
 
         // Draw
         glDrawArrays(GL_TRIANGLE_STRIP, 0, verts_.size());
-
-        // Cleanup
-        glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
+
+    render_text(drawable_size, registry);
 }
 
 RenderSystem::CyberpunkBackground::CyberpunkBackground() {
@@ -140,4 +126,78 @@ void RenderSystem::render_background(glm::uvec2 drawable_size) {
 
     // Draw
     glDrawArrays(GL_TRIANGLE_STRIP, 0, background_.vertices.size());
+}
+
+/**
+ * Render all text objects
+ *
+ * TODO: Inefficent - should only shape text once/on text update, not per frame
+ *
+ * TODO: Inefficient - move scaling by drawable_size to an ortho matrix, not
+ * manual
+ */
+void RenderSystem::render_text(glm::uvec2 drawable_size,
+                               entt::registry &registry) {
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    // Render every text component
+    auto view = registry.view<TextComponent>();
+    for (const auto [_, text] : view.each()) {
+        // Vertex attribute data
+        glBindVertexArray(text.mesh.vao);
+
+        // Text shader program
+        glUseProgram(text.shader.m.program);
+
+        glm::vec2 scale_to_screen =
+            2.0f / glm::vec2{drawable_size.x, drawable_size.y};
+
+        glm::vec2 scaled_position = text.position / scale_to_screen;
+        float x = scaled_position.x;  // Starting x position
+        float y = scaled_position.y;  // Starting y position
+        float scale = text.scale;     // Scale for the text rendering
+
+        // Shape text and generate glyph map -- inefficent
+        GlyphData glyphs_data = text_renderer.shape_text(text.text);
+
+        // Iterate over all glyphs in the glyph map and render them:
+        std::vector<Glyph> glyphs =
+            text_renderer.generate_glyph_textures(glyphs_data);
+        for (auto const &glyph_entry : glyphs) {
+            Glyph ch = glyph_entry;
+
+            // Calculate the position and size of the current glyph:
+            float xpos = x + ch.bearing.x * scale;
+            float ypos = y - (ch.size.y - ch.bearing.y) * scale;
+            float w = ch.size.x * scale;
+            float h = ch.size.y * scale;
+
+            // Update the content of VBO memory with the quad vertices:
+            text.mesh.verts[0].position =
+                glm::vec2{xpos, ypos + h} * scale_to_screen;
+            text.mesh.verts[1].position =
+                glm::vec2{xpos + w, ypos + h} * scale_to_screen;
+            text.mesh.verts[2].position =
+                glm::vec2{xpos, ypos} * scale_to_screen;
+            text.mesh.verts[3].position =
+                glm::vec2{xpos + w, ypos} * scale_to_screen;
+            glBindBuffer(GL_ARRAY_BUFFER, text.mesh.vbo);
+            glBufferSubData(GL_ARRAY_BUFFER, 0,
+                            text.mesh.verts.size() * sizeof(Vertex),
+                            text.mesh.verts.data());
+
+            // Render glyph texture over quad:
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, ch.texture);
+            glUniform1i(text.shader.m.u_frag_texture_loc, 0);
+
+            // Render the quad:
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, text.mesh.verts.size());
+
+            // Advance the cursor for the next glyph (accounting for scaling):
+            // Bitshift by 6 to convert from 1/64th pixels to pixels
+            x += (ch.advance) * scale;
+        }
+    }
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 }

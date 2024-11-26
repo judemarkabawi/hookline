@@ -72,6 +72,8 @@ find_package(PNG REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(OpusFile CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(harfbuzz CONFIG REQUIRED)
+find_package(Freetype REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     # entt
     EnTT::EnTT
@@ -88,6 +90,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     OpusFile::opusfile
     # nlohmann/json
     nlohmann_json::nlohmann_json
+    # harfbuzz
+    harfbuzz::harfbuzz
+    harfbuzz::harfbuzz-subset
+    # Freetype
+    Freetype::Freetype
 )
 # target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/vendor)
 

@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "core/Application.hpp"
 
 #ifdef _WIN32
@@ -16,9 +18,17 @@ int main(int argc, char** argv) {
     (void)argc;
     (void)argv;
 
-    Application app;
-    app.init();
-    app.run();
+    try {
+        Application app;
+        app.init();
+        app.run();
+    } catch (std::exception const& e) {
+        std::cerr << "Unhandled exception:\n" << e.what() << std::endl;
+        return 1;
+    } catch (...) {
+        std::cerr << "Unhandled exception (unknown type)." << std::endl;
+        throw;
+    }
 
     return 0;
 }

@@ -1,8 +1,8 @@
 #include "GrapplingHook.hpp"
 
-#include "physics/util.hpp"
-#include "physics/RigidBodyComponent.hpp"
 #include "core/TransformComponent.hpp"
+#include "physics/RigidBodyComponent.hpp"
+#include "physics/util.hpp"
 
 void GrapplingHookComponent::try_attach(glm::vec2 start_position,
                                         glm::vec2 target_position,
@@ -21,7 +21,6 @@ void GrapplingHookComponent::try_attach(glm::vec2 start_position,
     }
 }
 
-
 void GrapplingHookComponent::detach() {
     if (!attached) {
         return;
@@ -33,11 +32,14 @@ void GrapplingHookComponent::detach() {
 void GrapplingHookComponent::hold(entt::registry &registry) {
     if (!attached) return;
     held = true;
-    auto [player_transform, player_rigidBody] = 
+    auto [player_transform, player_rigidBody] =
         registry.get<TransformComponent, RigidBodyComponent>(user);
 
-    glm::vec2 grapple_direction = glm::normalize(attached_position - player_transform.position);
-    glm::vec2 projVelocity = glm::dot(player_rigidBody.velocity, grapple_direction) * grapple_direction;
+    glm::vec2 grapple_direction =
+        glm::normalize(attached_position - player_transform.position);
+    glm::vec2 projVelocity =
+        glm::dot(player_rigidBody.velocity, grapple_direction) *
+        grapple_direction;
     player_rigidBody.velocity -= 0.8f * projVelocity;
 }
 
