@@ -35,11 +35,15 @@ PlayerShader::PlayerShader() {
 "uniform float u_time; \n"
 "uniform float u_health; \n"
 "out vec4 FragColor;\n"
-
+"float atan2(float y, float x) { return mod(atan(y,x) + 3.141592, 2.0*3.141592); }\n"
 "void main()    \n"
 "{  \n"
 "    // Output to screen    \n"
-"    FragColor = vec4(vec3(u_health), 1.0);\n"
+"    vec2 uv = texture_coord*2.0 - 1.0;\n"
+"    float angle = atan2(uv.y, uv.x);\n"
+"    angle += 3.141592;\n"
+"    angle /= 2.0*3.141592;\n"
+"    FragColor = vec4(vec3(float(angle <= u_health)), 1.0);\n"
 "}\n");
 
     m.a_position_loc = glGetAttribLocation(m.program, "a_position");

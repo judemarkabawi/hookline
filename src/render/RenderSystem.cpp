@@ -81,6 +81,7 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
         } else if (renderable.type == RenderComponent::RenderType::PLAYER) {
             glUseProgram(player_shader.m.program);
             auto health = registry.get<HealthComponent>(entity);
+            //printf("%f\n", (float)health.health/(float)health.inital_health);
             player_shader.updateUniforms(transform.position, transform.scale, transform.rotation,
                                             camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
                                             u_time, (float)health.health/(float)health.inital_health);

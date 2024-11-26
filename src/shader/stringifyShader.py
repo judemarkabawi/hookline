@@ -66,7 +66,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {    
     vec2 uv = tex_coord*2.0 - iResolution.xy/iResolution.y;
     
-    
+    float atan2(float y, float x) { return mod(atan(y,x) + 3.141592, 2.0*3.141592); }
     float dist = length(uv);
     float angle = atan2(-movement_vector.x, -movement_vector.y);
     

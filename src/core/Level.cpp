@@ -201,8 +201,9 @@ void load_player(const json &data, Level &level) {
     registry.emplace<ColliderComponent>(
         player, ColliderComponent().set_hookable(false));
     registry.emplace<RenderComponent>(
-        player, RenderComponent::from_vertices_color(
-                    hookline::get_basic_shape_debug(), color_vec));
+        player, RenderComponent::from_vertices_color_tex(
+                    hookline::get_basic_shape_debug(), color_vec, hookline::get_basic_uvs_debug(),
+                    RenderComponent::RenderType::PLAYER));
     registry.emplace<InputComponent>(player);
     registry.emplace<HealthComponent>(player, HealthComponent(health));
     level.player = player;
