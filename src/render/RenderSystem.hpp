@@ -8,6 +8,8 @@
 #include "core/text/TextRenderer.hpp"
 #include "shader/CyberpunkBackgroundShader.hpp"
 #include "shader/CyberpunkBackgroundShaderFull.hpp"
+#include "shader/BasicMeshShader.hpp"
+#include "shader/GrappleBoxShader.hpp"
 #include "core/AssetManager.hpp"
 
 /**
@@ -82,7 +84,11 @@ class RenderSystem {
         MenuBackground &operator=(MenuBackground &&other) = delete;
     };
 
+    TextRenderer text_renderer;
+
+    BasicMeshShader mesh_shader;
+    GrappleBoxShader grapple_shader;
     CyberpunkBackground background_;
     MenuBackground menu_background_;
-    TextRenderer text_renderer;
+
 };

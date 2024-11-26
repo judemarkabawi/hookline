@@ -7,6 +7,8 @@
 
 #include "render/Mesh2D.hpp"
 #include "shader/BasicMeshShader.hpp"
+#include "shader/GrappleBoxShader.hpp"
+#include "shader/CyberpunkBackgroundShaderFull.hpp"
 
 /**
  * RenderComponent holding rendering data like a shader progrma, vertices, etc.
@@ -40,12 +42,18 @@ class RenderComponent {
 
     void set_visible(bool visible);
 
-    BasicMeshShader program_;
+    enum RenderType{
+        BASE,
+        GRAPPLE_POINT,
+        PLAYER
+    };
+    RenderType type = BASE;
+
     Mesh2D mesh_;
     GLuint texture_ = 0;  // non-owning
     bool visible_ = true;
     bool use_texture_ = false;
 
-   private:
-    RenderComponent() = default;
+    private:
+        RenderComponent() = default;
 };

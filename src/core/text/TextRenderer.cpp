@@ -59,7 +59,7 @@ TextRenderer::TextRenderer() {
 
     if (FT_New_Face(
             ft_library,
-            hookline::data_path("../../assets/Montserrat-Regular.ttf").c_str(),
+            hookline::data_path("../assets/Montserrat-Regular.ttf").c_str(),
             0, &ft_face)) {
         throw std::runtime_error("Font loading error");
     }

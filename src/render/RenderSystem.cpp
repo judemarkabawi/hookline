@@ -41,36 +41,20 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
         }
 
         const auto &verts_ = renderable.mesh_.verts;
-        const auto &program_ = renderable.program_;
+
+        //const auto &program_ = renderable.program_;
 
         // Vertex attribute data
         glBindVertexArray(renderable.mesh_.vao);
 
-        // Use program
-        glUseProgram(program_.m.program);
-
-        // Uniforms
-        // -- Vertex shader
-        glUniform2f(program_.m.u_position_loc, transform.position.x,
-                    transform.position.y);
-        glUniform2f(program_.m.u_scale_loc, transform.scale.x,
-                    transform.scale.y);
-        glUniform1f(program_.m.u_rotation_loc, transform.rotation);
-        glUniform2f(program_.m.u_camera_position_loc,
-                    camera_transform.position.x, camera_transform.position.y);
-        glUniform2f(program_.m.u_camera_viewport_size_loc,
-                    camera.viewport_size.x, camera.viewport_size.y);
-        glUniform1f(program_.m.u_camera_pixels_per_unit_loc,
-                    camera.pixels_per_unit);
-        // -- Fragment shader
-        glUniform1i(program_.m.u_frag_use_texture_loc, renderable.use_texture_);
-
-        // Texture
-        if (renderable.use_texture_) {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, renderable.texture_);
-            glUniform1i(program_.m.u_frag_texture_loc, 0);
+        if(renderable.type == RenderComponent::RenderType::BASE) {
+            glUseProgram(mesh_shader.m.program);
+            mesh_shader.updateUniforms(transform.position, transform.scale, transform.rotation,
+                                       camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
+                                       renderable.use_texture_, renderable.texture_);
         }
+
+
 
         // Draw
         glDrawArrays(GL_TRIANGLE_STRIP, 0, verts_.size());
