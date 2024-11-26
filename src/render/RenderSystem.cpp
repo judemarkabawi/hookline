@@ -133,6 +133,8 @@ void RenderSystem::load_background_images(AssetManager* manager) {
     background_.fg_color = manager->load_texture("fg_color", hookline::data_path("../../assets/textures/fg_color.png"), GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
     background_.fg_normals = manager->load_texture("fg_normals", hookline::data_path("../../assets/textures/fg_normals.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
 
+    background_.bg_cube = manager->load_texture("bg_cube_", hookline::data_path("../../assets/textures/bg_cube_"), GL_TEXTURE_CUBE_MAP, GL_LINEAR, GL_REPEAT);
+
 }
 
 void RenderSystem::bind_textures() {
@@ -158,8 +160,8 @@ void RenderSystem::bind_textures() {
     glActiveTexture(GL_TEXTURE8);
     glBindTexture(GL_TEXTURE_2D, background_.fg_normals);
 
-    //glActiveTexture(GL_TEXTURE9);
-    //glBindTexture(GL_TEXTURE_CUBE_MAP, background_.bg_cube);
+    glActiveTexture(GL_TEXTURE9);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, background_.bg_cube);
 }
 
 void RenderSystem::unbind_textures() {
@@ -169,9 +171,7 @@ void RenderSystem::unbind_textures() {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
     glActiveTexture(GL_TEXTURE0 + 9);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    //glActiveTexture(GL_TEXTURE9);
-    //glBindTexture(GL_TEXTURE_CUBE_MAP, background_.bg_cube);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     glActiveTexture(GL_TEXTURE0);
 }
 

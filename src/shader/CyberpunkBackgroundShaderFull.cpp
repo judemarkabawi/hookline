@@ -350,7 +350,7 @@ CyberpunkBackgroundShaderFull::CyberpunkBackgroundShaderFull() {
         "    \n"
         "    dist = alpha > 0.0 ? dist : MAX_FOG_DIST;\n"
         "    float fog_factor = uv0.y*0.6*pow(dist/MAX_FOG_DIST, 1.5);\n"
-        "    vec3 fog = env_pallette(fog_factor)*vec3(0.9) + vec3(0.1, 0.1, 0.05);\n"
+        "    vec3 fog = env_pallette(fog_factor)*vec3(1.1);// + vec3(0.1, 0.1, 0.05);\n"
         "    float fog_amt = 0.9;\n"
         "    \n"
         "    col += emission;\n"
@@ -403,12 +403,15 @@ CyberpunkBackgroundShaderFull::CyberpunkBackgroundShaderFull() {
     m.u_bg_emission = glGetUniformLocation(m.program, "u_bg_emission");
     m.u_bg_color = glGetUniformLocation(m.program, "u_bg_color");
     m.u_bg_normal = glGetUniformLocation(m.program, "u_bg_normal");
+
     m.u_mg_emission = glGetUniformLocation(m.program, "u_mg_emission");
     m.u_mg_color = glGetUniformLocation(m.program, "u_mg_color");
     m.u_mg_normal = glGetUniformLocation(m.program, "u_mg_normal");
+
     m.u_fg_emission = glGetUniformLocation(m.program, "u_fg_emission");
     m.u_fg_color = glGetUniformLocation(m.program, "u_fg_color");
     m.u_fg_normal = glGetUniformLocation(m.program, "u_fg_normal");
+
     m.u_bg_cube = glGetUniformLocation(m.program, "u_bg_cube");
 
     //set TEX to always refer to texture binding zero:
