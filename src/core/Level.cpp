@@ -45,6 +45,7 @@ entt::entity create_box(entt::registry &registry, glm::vec2 position,
     return box;
 }
 
+#if 0
 entt::entity create_hookable_unbreakable(entt::registry &registry, glm::vec2 position) {
     return create_box(registry, position, glm::vec2{0.05f, 0.05f}, true, false, false, glm::vec4{0.07f, 0.11f, 0.23f, 1.0f});
 }
@@ -52,6 +53,7 @@ entt::entity create_hookable_unbreakable(entt::registry &registry, glm::vec2 pos
 entt::entity create_hookable_breakable(entt::registry &registry, glm::vec2 position) {
     return create_box(registry, position, glm::vec2{0.05f, 0.05f}, true, true, false, glm::vec4{0.55f, 0.27f, 0.07f, 1.0f});
 }
+#endif
 
 
 

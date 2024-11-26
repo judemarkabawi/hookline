@@ -24,7 +24,7 @@ void ProjectileSystem::update(float dt, entt::registry &registry,
     auto &player_health = registry.get<HealthComponent>(player);
     // Process all spawners
     registry.view<TransformComponent, ProjectileSpawnerComponent>().each(
-        [&](auto entity, auto &transform, auto &spawner) {
+        [&](auto _, auto &transform, auto &spawner) {
             spawner.timer += dt;
 
             switch (spawner.type) {
