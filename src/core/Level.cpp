@@ -96,7 +96,7 @@ void load_player(const json &data, Level &level) {
 }
 
 void load_sounds(const json &data, Level &level) {
-    std::filesystem::path sound_assets_dir = "../assets/sounds";
+    std::filesystem::path sound_assets_dir = "../../assets/sounds";
 
     std::vector<std::string> sounds = data["sounds"];
     for (auto &sound : sounds) {

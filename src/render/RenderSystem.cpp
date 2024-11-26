@@ -104,17 +104,17 @@ RenderSystem::CyberpunkBackground::CyberpunkBackground() {
 
 void RenderSystem::load_background_images(AssetManager* manager) {
         //load associated textures
-    background_.bg_emission = manager->load_texture("bg_emission", hookline::data_path("../assets/textures/bg_emission.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
-    background_.bg_color = manager->load_texture("bg_color", hookline::data_path("../assets/textures/bg_color.png"), GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
-    background_.bg_normals = manager->load_texture("bg_normals", hookline::data_path("../assets/textures/bg_normals.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+    background_.bg_emission = manager->load_texture("bg_emission", hookline::data_path("../../assets/textures/bg_emission.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+    background_.bg_color = manager->load_texture("bg_color", hookline::data_path("../../assets/textures/bg_color.png"), GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
+    background_.bg_normals = manager->load_texture("bg_normals", hookline::data_path("../../assets/textures/bg_normals.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
 
-    background_.mg_emission = manager->load_texture("bg_emission", hookline::data_path("../assets/textures/bg_emission.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
-    background_.mg_color = manager->load_texture("bg_color", hookline::data_path("../assets/textures/bg_color.png"), GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
-    background_.mg_normals = manager->load_texture("bg_normals", hookline::data_path("../assets/textures/bg_normals.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+    background_.mg_emission = manager->load_texture("bg_emission", hookline::data_path("../../assets/textures/bg_emission.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+    background_.mg_color = manager->load_texture("bg_color", hookline::data_path("../../assets/textures/bg_color.png"), GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
+    background_.mg_normals = manager->load_texture("bg_normals", hookline::data_path("../../assets/textures/bg_normals.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
 
-    background_.fg_emission = manager->load_texture("fg_emission", hookline::data_path("../assets/textures/fg_emission.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
-    background_.fg_color = manager->load_texture("fg_color", hookline::data_path("../assets/textures/fg_color.png"), GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
-    background_.fg_normals = manager->load_texture("fg_normals", hookline::data_path("../assets/textures/fg_normals.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+    background_.fg_emission = manager->load_texture("fg_emission", hookline::data_path("../../assets/textures/fg_emission.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+    background_.fg_color = manager->load_texture("fg_color", hookline::data_path("../../assets/textures/fg_color.png"), GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
+    background_.fg_normals = manager->load_texture("fg_normals", hookline::data_path("../../assets/textures/fg_normals.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
 
 }
 
