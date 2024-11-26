@@ -43,6 +43,7 @@ class Game {
             glm::vec2 position;
         } mouse;
     } player_;
+    
     entt::entity grapple_entity;
     entt::entity camera_entity;
 

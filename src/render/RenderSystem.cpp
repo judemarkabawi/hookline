@@ -13,6 +13,7 @@
 #include "render/Mesh2D.hpp"
 #include "render/RenderComponent.hpp"
 #include "gameplay/ProjectileComponent.hpp"
+#include "gameplay/HealthComponent.hpp"
 #include "shader/CyberpunkBackgroundShaderFull.hpp"
 #include "util/misc.hpp"
 #include "constants.hpp"
@@ -77,6 +78,12 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
                                             camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
                                             u_time, projectile.direction, hookline::projectile_glow_ratio, projectile.currtime/projectile.lifetime);
             glBlendFunc(GL_ONE, GL_ONE);
+        } else if (renderable.type == RenderComponent::RenderType::PLAYER) {
+            glUseProgram(player_shader.m.program);
+            auto health = registry.get<HealthComponent>(entity);
+            player_shader.updateUniforms(transform.position, transform.scale, transform.rotation,
+                                            camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
+                                            u_time, (float)health.health/(float)health.inital_health);
         }
 
         // Draw
