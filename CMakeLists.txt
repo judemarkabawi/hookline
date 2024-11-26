@@ -134,6 +134,8 @@ else()
                 "zlibd1\.dll"
                 "harfbuzz\.dll"
                 "freetyped\.dll"
+                "bz2d\.dll"
+                "brotli.*\.dll"
             PRE_EXCLUDE_REGEXES ".*"
     )
 endif()
