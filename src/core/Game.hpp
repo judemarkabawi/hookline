@@ -18,6 +18,8 @@
 #include "physics/PhysicsSystem.hpp"
 #include "render/CameraSystem.hpp"
 #include "render/RenderSystem.hpp"
+#include "shader/CyberpunkBackgroundShader.hpp"
+#include "shader/CyberpunkBackgroundShaderNew.hpp"
 
 /**
  * Main Game class
@@ -53,7 +55,21 @@ class Game {
     ProjectileSystem projectileSystem;
     entt::registry registry;
 
+    enum class Mode {
+        StartMenu,
+        Game,
+    } mode = Mode::StartMenu;
+
    private:
     void setup_camera();
     void setup_map();
+
+    /* -- TODO: Make these Modes and not just in Game -- */
+    // Start Menu "Mode"
+    RenderSystem start_menu_rendering;
+
+    entt::registry start_menu_registry; // for text components, overkill
+    void start_menu_update(float dt);
+    void start_menu_render(glm::uvec2 drawable_size);
+    bool start_menu_handle_event(SDL_Event const &event, glm::uvec2 drawable_size);
 };

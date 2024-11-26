@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 #include "core/text/TextRenderer.hpp"
+#include "shader/CyberpunkBackgroundShader.hpp"
 #include "shader/CyberpunkBackgroundShaderFull.hpp"
 #include "core/AssetManager.hpp"
 
@@ -22,11 +23,15 @@ class RenderSystem {
 
     void render(glm::uvec2 drawable_size, entt::registry &registry,
                 entt::entity camera);
+    void render_text(glm::uvec2 drawable_size, entt::registry &registry);
+
     void load_background_images(AssetManager *assets);
 
+    void render_menu_background(glm::uvec2 drawable_size);
    private:
     void render_background(glm::uvec2 drawable_size, glm::vec2 camera_pos);
-    void render_text(glm::uvec2 drawable_size, entt::registry &registry);
+
+   private:
 
     struct CyberpunkBackground {
         CyberpunkBackgroundShaderFull shader;
@@ -60,7 +65,24 @@ class RenderSystem {
     void bind_textures();
     void unbind_textures();
 
+    struct MenuBackground {
+        CyberpunkBackgroundShader shader;
+        std::vector<glm::vec2> vertices;
+        GLuint vao;
+        GLuint vbo;
+
+        MenuBackground();
+        ~MenuBackground();
+
+        MenuBackground(const MenuBackground &other) = delete;
+        MenuBackground &operator=(const MenuBackground &other) =
+            delete;
+
+        MenuBackground(MenuBackground &&other) = delete;
+        MenuBackground &operator=(MenuBackground &&other) = delete;
+    };
 
     CyberpunkBackground background_;
+    MenuBackground menu_background_;
     TextRenderer text_renderer;
 };

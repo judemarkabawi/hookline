@@ -9,7 +9,6 @@
 
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
-#include <SDL_render.h>
 
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
@@ -38,15 +37,16 @@ Game::Game() : collectables(&asset_manager), projectileSystem(&asset_manager) {
 
     setup_camera();
 
-    auto test = registry.create();
-    registry.emplace<TextComponent>(
-        test, TextComponent::from_text("Hi how are you", {0.5, -0.5}, 1.0f));
-
     // Play music
     Sound::loop(asset_manager.get_sound("guitar_loop_music"), 0.25);
 }
 
 void Game::update(float dt) {
+    if (mode == Mode::StartMenu) {
+        start_menu_update(dt);
+        return;
+    }
+
     /* -- PLAYER INPUT & GRAPPLE -- */
     // TODO: Put input into a separate input component and handle this movement
     auto &inputs = registry.get<InputComponent>(player_.entity);
@@ -116,11 +116,20 @@ void Game::update(float dt) {
 }
 
 void Game::render(glm::uvec2 drawable_size) {
+    if (mode == Mode::StartMenu) {
+        start_menu_render(drawable_size);
+        return;
+    }
+
     // Render scene
     rendering.render(drawable_size, registry, camera_entity);
 }
 
 bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
+    if (mode == Mode::StartMenu) {
+        return start_menu_handle_event(event, drawable_size);
+    }
+
     if (event.type == SDL_KEYDOWN) {
         if (event.key.keysym.sym == SDLK_a) {
             player_.left.pressed = true;
@@ -202,4 +211,45 @@ void Game::setup_map() {
             collectables.spawn_random(registry);
         }
     }
+}
+
+void Game::start_menu_update(float dt) {
+    (void)dt;
+
+    static bool initialized = false;
+    if (initialized) {
+        return;
+    }
+
+    initialized = true;
+    entt::entity title = registry.create();
+    start_menu_registry.emplace<TextComponent>(
+        title, TextComponent::from_text("Hookline", {-0.35, 0.5}, 5.0f));
+
+    entt::entity play_button = registry.create();
+    start_menu_registry.emplace<TextComponent>(
+        play_button,
+        TextComponent::from_text("Click anywhere to play", {-0.2, -0.1}, 1.0f));
+}
+
+void Game::start_menu_render(glm::uvec2 drawable_size) {
+    glClearColor(0, 0, 0, 0);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    start_menu_rendering.render_menu_background(drawable_size);
+
+    start_menu_rendering.render_text(drawable_size, start_menu_registry);
+}
+
+bool Game::start_menu_handle_event(SDL_Event const &event,
+                                   glm::uvec2 drawable_size) {
+    (void)drawable_size;
+
+    if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (event.button.button == SDL_BUTTON_LEFT) {
+            mode = Mode::Game;
+            return true;
+        }
+    }
+    return false;
 }

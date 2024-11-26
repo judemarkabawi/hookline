@@ -24,10 +24,10 @@ CyberpunkBackgroundShaderNew::CyberpunkBackgroundShaderNew() {
         } \n \
          \n \
         vec3 hex_palette(float t) { \n \
-            vec3 a = vec3(0.5,0.5,0.5); \n \
-            vec3 b = vec3(0.5,0.5,0.5); \n \
+            vec3 a = vec3(0.4,0.3,0.5); \n \
+            vec3 b = vec3(0.4,0.3,0.2); \n \
             vec3 c = vec3(1.0,1.0,1.0); \n \
-            vec3 d = vec3(0.0,0.10,0.20); \n \
+            vec3 d = vec3(0.2,0.1,0.05); \n \
             vec3 col = palette(t, a, b, c, d); \n \
             return col; \n \
         } \n \

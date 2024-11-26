@@ -264,3 +264,54 @@ void RenderSystem::render_text(glm::uvec2 drawable_size,
     }
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 }
+
+RenderSystem::MenuBackground::MenuBackground() {
+    vertices = hookline::get_basic_shape_debug();
+
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+
+    // Bind VAO
+    glBindVertexArray(vao);
+
+    // Vertex data
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec2),
+                 vertices.data(), GL_STATIC_DRAW);
+
+    // Vertex attribute data
+    glVertexAttribPointer(shader.m.a_position_loc, 2, GL_FLOAT, GL_FALSE,
+                          sizeof(glm::vec2), (void *)0);
+    glEnableVertexAttribArray(shader.m.a_position_loc);
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+RenderSystem::MenuBackground::~MenuBackground() {
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+}
+
+void RenderSystem::render_menu_background(glm::uvec2 drawable_size) {
+    // Bind VAO
+    glBindVertexArray(menu_background_.vao);
+
+    // Use program
+    glUseProgram(menu_background_.shader.m.program);
+
+    // Uniforms
+    // -- Fragment shader
+    using namespace std::chrono;
+    static auto start_time = high_resolution_clock::now();
+    auto time_diff =
+        duration_cast<milliseconds>(high_resolution_clock::now() - start_time);
+    float time = time_diff.count();
+    glUniform1f(menu_background_.shader.m.u_time_loc, time);
+
+    glUniform2f(menu_background_.shader.m.u_drawable_size_loc,
+                (float)drawable_size.x, (float)drawable_size.y);
+
+    // Draw
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, menu_background_.vertices.size());
+}
