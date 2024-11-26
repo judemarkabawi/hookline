@@ -3,6 +3,8 @@
 #include "core/TransformComponent.hpp"
 #include "physics/ColliderComponent.hpp"
 #include "physics/RigidBodyComponent.hpp"
+#include "physics/GrapplingHook.hpp"
+#include "gameplay/HealthComponent.hpp"
 
 namespace {
 bool check_collision_aabb(const TransformComponent &transform1,
@@ -32,15 +34,21 @@ void CollisionSystem::update(float dt, entt::registry &registry) {
     auto view =
         registry
             .view<TransformComponent, ColliderComponent, RigidBodyComponent>();
+    std::vector<entt::entity> to_destroy;
     for (auto [entity1, transform1, collider1, rigid_body1] : view.each()) {
         for (auto [entity2, transform2, collider2, rigid_body2] : view.each()) {
             if (entity1 == entity2) continue;
             if (check_collision_aabb(transform1, collider1, transform2,
                                      collider2)) {
                 if (collider1.can_collide && collider2.can_collide) {
-                    handle_collision(entity1, entity2, registry);
+                    handle_collision(entity1, entity2, registry, to_destroy);
                 }
             }
+        }
+    }
+    for (auto entity : to_destroy) {
+        if (registry.valid(entity)) {
+            registry.destroy(entity);
         }
     }
 };
@@ -51,7 +59,7 @@ void CollisionSystem::update(float dt, entt::registry &registry) {
  */
 void CollisionSystem::handle_collision(entt::entity entity1,
                                        entt::entity entity2,
-                                       entt::registry &registry) {
+                                       entt::registry &registry, std::vector<entt::entity> &to_destroy) {
     auto [collider1, transform1, rigid_body1] =
         registry.get<ColliderComponent, TransformComponent, RigidBodyComponent>(
             entity1);
@@ -124,4 +132,34 @@ void CollisionSystem::handle_collision(entt::entity entity1,
     if (collider2.can_move) {
         rigid_body2.velocity = -bounce * velocity2_normal + velocity2_tangent;
     }
+
+    if(collider1.is_breakable){
+        to_destroy.push_back(entity1);
+        // Detach grappling hook if attached
+        for (auto [_, grapple] : registry.view<GrapplingHookComponent>().each()) {
+            if(grapple.attached) {
+                grapple.detach();
+            }
+        }
+    }
+
+    if (collider2.is_breakable) {
+        to_destroy.push_back(entity2);
+        // Detach grappling hook if attached
+        for (auto [_, grapple] : registry.view<GrapplingHookComponent>().each()) {
+            if(grapple.attached) {
+                grapple.detach();
+            }
+        }
+    }
+
+    if (collider1.is_damaging && registry.all_of<HealthComponent>(entity2)) {
+        auto &health = registry.get<HealthComponent>(entity2);
+        health.take_damage(1);
+    }
+    if (collider2.is_damaging && registry.all_of<HealthComponent>(entity1)) {
+        auto &health = registry.get<HealthComponent>(entity1);
+        health.take_damage(1);
+    }
+
 }
