@@ -23,7 +23,8 @@ namespace {
     Helper to make a manually defined box on the map.
  */
 entt::entity create_box(entt::registry &registry, glm::vec2 position,
-                        glm::vec2 scale, bool hookable, glm::vec4 color) {
+                        glm::vec2 scale, bool hookable, glm::vec4 color, 
+                        RenderComponent::RenderType type = RenderComponent::RenderType::BASE) {
     auto box = registry.create();
     registry.emplace<TransformComponent>(
         box, TransformComponent(position, scale, 0.0f));
@@ -31,8 +32,8 @@ entt::entity create_box(entt::registry &registry, glm::vec2 position,
     registry.emplace<ColliderComponent>(
         box, ColliderComponent().set_can_move(false).set_hookable(hookable));
     registry.emplace<RenderComponent>(
-        box, RenderComponent::from_vertices_color(
-                 hookline::get_basic_shape_debug(), color));
+        box, RenderComponent::from_vertices_color_tex(
+                 hookline::get_basic_shape_debug(), color, hookline::get_basic_uvs_debug(), type));
     return box;
 }
 
@@ -56,8 +57,13 @@ void load_objects(const json &data, Level &level) {
         glm::vec4 color_vec(color[0].get<float>(), color[1].get<float>(),
                             color[2].get<float>(), color[3].get<float>());
 
+        RenderComponent::RenderType type = RenderComponent::RenderType::BASE;
+        if(hookable) {
+            type = RenderComponent::RenderType::GRAPPLE_POINT;
+        }
+
         create_box(level.registry, position_vec, scale_vec, hookable,
-                   color_vec);
+                   color_vec, type);
     }
 }
 

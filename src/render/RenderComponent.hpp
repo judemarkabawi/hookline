@@ -21,15 +21,29 @@ class RenderComponent {
     /**
      * Make a new RenderComponent using vertices and a (default) color.
      */
+    enum RenderType{
+        BASE,
+        GRAPPLE_POINT,
+        PLAYER
+    };
+
+    RenderType type = BASE;
+
     static RenderComponent from_vertices_color(
         const std::vector<glm::vec2>& vertices,
-        glm::vec4 color = {0.0f, 0.0f, 0.0f, 1.0f});
+        glm::vec4 color = {0.0f, 0.0f, 0.0f, 1.0f},
+        RenderType type = BASE);
     /**
      * Make a new RenderComponent using vertices and a texture;
      */
     static RenderComponent from_vertices_texture(
         const std::vector<glm::vec2>& vertices,
-        const std::vector<glm::vec2>& tex_coords, GLuint texture);
+        const std::vector<glm::vec2>& tex_coords, GLuint texture,
+        RenderType type = BASE);
+
+    static RenderComponent from_vertices_color_tex(const std::vector<glm::vec2>& vertices, 
+                    glm::vec4 color, const std::vector<glm::vec2>& tex_coords,
+                    RenderType type = BASE) ;
 
     ~RenderComponent() = default;
 
@@ -41,13 +55,6 @@ class RenderComponent {
     RenderComponent& operator=(RenderComponent&& other) noexcept = default;
 
     void set_visible(bool visible);
-
-    enum RenderType{
-        BASE,
-        GRAPPLE_POINT,
-        PLAYER
-    };
-    RenderType type = BASE;
 
     Mesh2D mesh_;
     GLuint texture_ = 0;  // non-owning

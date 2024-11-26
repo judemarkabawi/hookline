@@ -65,6 +65,11 @@ std::vector<glm::vec2> get_basic_shape_debug() {
             /*TL*/ {-1.0, 1.0}, /*TR*/ {1.0, 1.0}};
 }
 
+std::vector<glm::vec2> get_basic_uvs_debug() {
+    return {/*BL*/ {0.0, 0.0}, /*BR*/ {1.0, 0.0},
+            /*TL*/ {0.0, 1.0}, /*TR*/ {1.0, 1.0}};
+}
+
 std::string data_path(std::string const &suffix) {
     static std::string path = get_exe_path();  // cache result of get_exe_path()
     return path + "/" + suffix;

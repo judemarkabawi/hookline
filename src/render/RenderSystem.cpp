@@ -47,14 +47,22 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
         // Vertex attribute data
         glBindVertexArray(renderable.mesh_.vao);
 
+        using namespace std::chrono;
+        static auto start_time = high_resolution_clock::now();
+        auto time_diff = duration_cast<milliseconds>(high_resolution_clock::now() - start_time);
+        float time = time_diff.count();
+        float u_time = time/1000.0f; //in seconds
         if(renderable.type == RenderComponent::RenderType::BASE) {
             glUseProgram(mesh_shader.m.program);
             mesh_shader.updateUniforms(transform.position, transform.scale, transform.rotation,
                                        camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
                                        renderable.use_texture_, renderable.texture_);
+        } else if (RenderComponent::RenderType::GRAPPLE_POINT) {
+            glUseProgram(grapple_shader.m.program);
+            grapple_shader.updateUniforms(transform.position, transform.scale, transform.rotation,
+                                       camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
+                                       renderable.use_texture_, renderable.texture_, u_time);
         }
-
-
 
         // Draw
         glDrawArrays(GL_TRIANGLE_STRIP, 0, verts_.size());

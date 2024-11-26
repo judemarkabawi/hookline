@@ -12,6 +12,12 @@ namespace hookline {
 std::vector<glm::vec2> get_basic_shape_debug();
 
 /**
+    Get a square with uvs at the 4 corners in OpenGL coordinates (0,
+   1), etc. from BL -> BR -> TL -> TR.
+ */
+std::vector<glm::vec2> get_basic_uvs_debug();
+
+/**
     Construct a path based on the location of the currently-running executable
 
     (e.g. if running /home/ix/game0/game.exe will return '/home/ix/game0/' +
