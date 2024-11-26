@@ -1,12 +1,13 @@
 import string
 
 input = '''
-#version 330
-in vec2 texture_coord;
-in vec4 color;
-uniform float u_time;
-uniform vec2 u_drawable_size"
-uniform float u_size_ratio;
+//uniform vec4 glow_col;
+//uniform float u_time;
+//uniform float = size_ratio;
+//uniform vec2 movement_vector;
+
+//conversion functions from
+//https://gist.github.com/983/e170a24ae8eba2cd174f
 
 //conversion functions from
 //https://gist.github.com/983/e170a24ae8eba2cd174f
@@ -28,100 +29,91 @@ vec3 hsv2rgb(vec3 c)
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
-// The MIT License
-// Copyright © 2019 Inigo Quilez
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-// Distance to a regular pentagon, without trigonometric functions. 
-
-// List of some other 2D distances: https://www.shadertoy.com/playlist/MXdSRf
-//
-// and iquilezles.org/articles/distfunctions2d
-
-float sdHexagram( in vec2 p, in float r )
+float sdParabolaSeg( in vec2 pos, in float wi, in float he )
 {
-    const vec4 k = vec4(-0.5,0.86602540378,0.57735026919,1.73205080757);
-    
-    p = abs(p);
-    p -= 2.0*min(dot(k.xy,p),0.0)*k.xy;
-    p -= 2.0*min(dot(k.yx,p),0.0)*k.yx;
-    p -= vec2(clamp(p.x,r*k.z,r*k.w),r);
-    return length(p)*sign(p.y);
+    pos.x = abs(pos.x);
+    float ik = wi*wi/he;
+    float p = ik*(he-pos.y-0.5*ik)/3.0;
+    float q = pos.x*ik*ik*0.25;
+    float h = q*q - p*p*p;
+    float r = sqrt(abs(h));
+    float x = (h>0.0) ? 
+        pow(q+r,1.0/3.0) - pow(abs(q-r),1.0/3.0)*sign(r-q) :
+        2.0*cos(atan(r/q)/3.0)*sqrt(p);
+    x = min(x,wi);
+    return length(pos-vec2(x,he-x*x/ik)) * 
+           sign(ik*(pos.y-he)+pos.x*pos.x);
 }
 
-
-void main()
+float sdParabola( in vec2 pos, in float k )
 {
-    vec4 glow_col = color;
-    
-    // Normalized pixel coordinates (from 0 to 1)
-    float minR = min(u_drawable_size.x, u_drawable_size.y);
-    vec2 uvFixed = (gl_FragCoord.xy/minR)*2.0 - u_drawable_size.xy/minR;
-    vec2 uvStretched = (gl_FragCoord.xy/u_drawable_size.xy)*2.0 - 1.0;
-    
-    float d = length(uvStretched);
-    float d_fixed = length(uvFixed);
-    
-    float haloD = d - u_size_ratio;
-    haloD = abs(haloD)/(1.25*u_size_ratio);
-    haloD = 0.2/haloD;
+    pos.x = abs(pos.x);
+    float ik = 1.0/k;
+    float p = ik*(pos.y - 0.5*ik)/3.0;
+    float q = 0.25*ik*ik*pos.x;
+    float h = q*q - p*p*p;
+    float r = sqrt(abs(h));
+    float x = (h>0.0) ? 
+        pow(q+r,1.0/3.0) - pow(abs(q-r),1.0/3.0)*sign(r-q) :
+        2.0*cos(atan(r,q)/3.0)*sqrt(p);
+    return length(pos-vec2(x,k*x*x)) * sign(pos.x-x);
+}
 
-    //little star effects
-    float starR = u_size_ratio * 1.5;
-    float starD = sdHexagram(uvFixed, starR);
-    starD = abs(starD)/starR;
-    starD = (sin(starD*(1.0/(3.0*starR)) - u_time*1.5) + 1.0)/1.5;
-    starD = 0.3 / (starD+0.3);
-    starD = pow(starD, 0.5);
-    starD *= 0.4;
+float atan2(float y, float x) { return mod(atan(y,x) + 3.141592, 2.0*3.141592); }
+
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{    
+    vec2 uv = tex_coord*2.0 - iResolution.xy/iResolution.y;
     
-    float ITERATIONS = 6.0;
-    for(float i = 0.0; i < ITERATIONS; i++) {
-       float r = u_size_ratio;
-       float s = 0.5;
-       float twoPi = 2.0*3.131592;
-       vec2 uvFixed0 = uvFixed;
-       uvFixed0 *= s;
-       float angle = twoPi*(i/ITERATIONS);
-       uvFixed0 += vec2(cos(angle), sin(angle))*r;
-       
-        float newStarR = starR*s;
-        float newStarD = sdHexagram(uvFixed0, newStarR);
-        newStarD = abs(newStarD)/newStarR;
-        newStarD = (sin(newStarD*(1.0/(3.0*newStarR)) - u_time*1.5 + 1.7) + 1.0)/1.5;
-        newStarD = 0.3 / (newStarD+0.3);
-        newStarD = pow(newStarD, 0.5);
-        //newStarD *= 0.4;
-        starD = max(starD, newStarD);
-    }
-    starD = clamp(starD, 0.0, 1.0);
-    starD *= 0.6*min(exp(-5.0*(d_fixed-0.15)), 1.0);
     
-    float bloomGlow = (sin(d*(1.0/u_size_ratio) - u_time) + 1.0)/2.0;
-    bloomGlow = pow(bloomGlow, 1.0);
-    bloomGlow = 0.5/(bloomGlow+0.6);
-    bloomGlow = pow(bloomGlow, 2.0);
-    bloomGlow = clamp(bloomGlow, 0.0, 1.0);
-    bloomGlow *= 0.3;
+    float dist = length(uv);
+    float angle = atan2(-movement_vector.x, -movement_vector.y);
     
-    float lightness = bloomGlow + haloD + starD;
+    float PI = 3.141592;
+    vec2 oldUV = uv;
+    uv.x = cos(angle)*oldUV.x - sin(angle)*oldUV.y;
+    uv.y = sin(angle)*oldUV.x + cos(angle)*oldUV.y;
+   
+    
+    
+    vec2 uv0 = uv;
+    float size_inv = 1.0/size_ratio;
+    uv *= size_inv;
+    uv.y -=  size_ratio;
+    float wave = (sin(uv.y*5.0 + 20.0*u_time - 10.0*cos(uv.x))+1.0)*0.3;
+
+    float d = sdParabola(uv, -size_ratio*3.0)/(size_ratio);
+    wave *= (0.5 - d);
+    wave = 0.05 / wave;
+    float p = d;
+    p = abs(p);
+    p = exp(-size_ratio*(p-0.3)*2.0);
+    
+    float falloff = 2.0*size_ratio - pow(length(uv0 ), 0.8);
+    p *= falloff;
+    p += max(-d*0.7, -0.4)*p;
+    
+    p += 0.0075/length(oldUV)/size_ratio;
+   
+    
+     wave *= p;
+     p += wave;
      
-    vec3 hsv = rgb2hsv(glow_col.xyz);
-    hsv.x += d*0.8 - starD*0.2;
-    hsv.y *= 0.6;
-    hsv.z *= 0.9;
-    vec3 col = hsv2rgb(hsv);
-    col += 0.1;
-    col = vec3(pow(col.x, 0.9), pow(col.y, 0.9), pow(col.z, 0.9));
-    
-    
+     float falloff2 = max(1.0 - min(pow(length(oldUV), 2.0), 1.0), 0.0);
+     p *= falloff2;
      
-    col *= lightness;
-    col *= (1.0 - pow((d_fixed+d)/2.0, 5.0)); //falloff towards edge
- 
+     vec3 hsv = rgb2hsv(color.xyz);
+     hsv.x += -0.1 + dist*size_ratio*0.4;
+     hsv.y *= 0.8;
+     vec3 col = hsv2rgb(hsv);
+     col += 0.3;
+     
+     
     // Output to screen
-    FragColor = vec4(col, clamp(lightness, 0.0, 1.0));
-}'''
+    FragColor = vec4(p*col, 1.0);
+}
+'''
 
 ret_str = ""
 for str in input.split('\n'):

@@ -12,6 +12,7 @@
 #include "render/CameraComponent.hpp"
 #include "render/Mesh2D.hpp"
 #include "render/RenderComponent.hpp"
+#include "gameplay/ProjectileComponent.hpp"
 #include "shader/CyberpunkBackgroundShaderFull.hpp"
 #include "util/misc.hpp"
 #include "constants.hpp"
@@ -69,11 +70,18 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
                                           camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
                                           drawable_size, u_time, hookline::collectible_glow_ratio);
             glBlendFunc(GL_ONE, GL_ONE);
+        } else if (renderable.type == RenderComponent::RenderType::PROJECTILE) {
+            glUseProgram(projectile_shader.m.program);
+            auto projectile = registry.get<ProjectileComponent>(entity);
+            projectile_shader.updateUniforms(transform.position, transform.scale, 0.0,
+                                            camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
+                                            u_time, projectile.direction, hookline::projectile_glow_ratio, projectile.currtime/projectile.lifetime);
+            glBlendFunc(GL_ONE, GL_ONE);
         }
 
         // Draw
         glDrawArrays(GL_TRIANGLE_STRIP, 0, verts_.size());
-        if(renderable.type == RenderComponent::RenderType::COLLECTIBLE) {
+        if(renderable.type == RenderComponent::RenderType::COLLECTIBLE || renderable.type == RenderComponent::RenderType::PROJECTILE) {
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
     }

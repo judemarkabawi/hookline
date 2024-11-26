@@ -25,6 +25,7 @@ class RenderComponent {
         BASE,
         GRAPPLE_POINT,
         COLLECTIBLE,
+        PROJECTILE,
         PLAYER
     };
 

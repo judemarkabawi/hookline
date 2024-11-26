@@ -11,6 +11,7 @@
 #include "shader/BasicMeshShader.hpp"
 #include "shader/GrappleBoxShader.hpp"
 #include "shader/CollectibleShader.hpp"
+#include "shader/ProjectileShader.hpp"
 #include "core/AssetManager.hpp"
 
 /**
@@ -90,6 +91,7 @@ class RenderSystem {
     BasicMeshShader mesh_shader;
     GrappleBoxShader grapple_shader;
     CollectibleShader collectible_shader;
+    ProjectileShader projectile_shader;
     CyberpunkBackground background_;
     MenuBackground menu_background_;
 

@@ -100,7 +100,7 @@ GrappleBoxShader::GrappleBoxShader() {
 "    b = smoothstep(0.0, 0.2, b);   \n"
 "    b = 0.1 / b;   \n"
 "    \n"
-"    d = sin(10.0*d + 2.0*u_time)/50.0;  \n"
+"    d = sin(1.0*d + 2.0*u_time)/50.0;;  \n"
 "    d = abs(d);    \n"
 "    d = smoothstep(0.0, 0.03, d);  \n"
 "    d = 0.125 / d; \n"

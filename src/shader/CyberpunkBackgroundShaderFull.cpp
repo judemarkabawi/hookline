@@ -385,7 +385,7 @@ CyberpunkBackgroundShaderFull::CyberpunkBackgroundShaderFull() {
         "    FragColor = vec4(color.xyz, 1.0);\n"
         "    \n"
         "    //mg\n"
-        "    render_layer(color, alpha, 80.0, uv + 0.5*u_drawable_size.xy/minR, u_camera_pos, MAX_FOG_DIST, u_time, u_mg_emission, u_mg_color, u_mg_normal, u_bg_cube);\n"
+        "    render_layer(color, alpha, 80.0, uv + 0.5*u_drawable_size.xy/minR + vec2(0.5, 0.0), u_camera_pos, MAX_FOG_DIST, u_time, u_mg_emission, u_mg_color, u_mg_normal, u_bg_cube);\n"
         "    if(alpha > 0.0) FragColor = mix(FragColor, vec4(vec3(color.xyz), 1.0), alpha);\n"
         "    \n"
         "    //fg\n"

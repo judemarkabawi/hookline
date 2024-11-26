@@ -8,6 +8,7 @@
 #include "gameplay/ProjectileComponent.hpp"
 #include "render/RenderComponent.hpp"
 #include "util/misc.hpp"
+#include "constants.hpp"
 
 float getRandomFloat(float min = -3.0f, float max = 3.0f) {
     static std::random_device rd;
@@ -94,9 +95,10 @@ void ProjectileSystem::spawn_horizontal_projectile(bool from_left, float height,
     registry.emplace<ProjectileComponent>(
         projectile, ProjectileType::Horizontal, direction, 0.5f, 100.0f);
     registry.emplace<RenderComponent>(
-        projectile,
-        RenderComponent::from_vertices_color(hookline::get_basic_shape_debug(),
-                                             {0.74, 0.08, 0.14, 1.0}));
+            projectile,
+            RenderComponent::from_vertices_color_tex(
+                hookline::get_basic_shape_debug(2.0/hookline::projectile_glow_ratio), 
+                {0.74, 0.08, 0.14, 1.0}, hookline::get_basic_uvs_debug(), RenderComponent::RenderType::PROJECTILE));
 }
 
 void ProjectileSystem::spawn_chasing_projectile(glm::vec2 origin,
@@ -107,9 +109,10 @@ void ProjectileSystem::spawn_chasing_projectile(glm::vec2 origin,
     registry.emplace<ProjectileComponent>(projectile, ProjectileType::Chasing,
                                           glm::vec2{0.0f, 1.0f}, 0.4f, 10.0f);
     registry.emplace<RenderComponent>(
-        projectile,
-        RenderComponent::from_vertices_color(hookline::get_basic_shape_debug(),
-                                             {0.74, 0.08, 0.14, 1.0}));
+            projectile,
+            RenderComponent::from_vertices_color_tex(
+                hookline::get_basic_shape_debug(2.0/hookline::projectile_glow_ratio), 
+                {0.74, 0.08, 0.14, 1.0}, hookline::get_basic_uvs_debug(), RenderComponent::RenderType::PROJECTILE));
 }
 
 void ProjectileSystem::spawn_spray_projectile(glm::vec2 origin,
@@ -125,8 +128,9 @@ void ProjectileSystem::spawn_spray_projectile(glm::vec2 origin,
                                               direction, 0.6f, 10.0f);
         registry.emplace<RenderComponent>(
             projectile,
-            RenderComponent::from_vertices_color(
-                hookline::get_basic_shape_debug(), {0.74, 0.08, 0.14, 1.0}));
+            RenderComponent::from_vertices_color_tex(
+                hookline::get_basic_shape_debug(2.0/hookline::projectile_glow_ratio), 
+                {0.74, 0.08, 0.14, 1.0}, hookline::get_basic_uvs_debug(), RenderComponent::RenderType::PROJECTILE));
     }
 }
 
