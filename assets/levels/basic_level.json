@@ -1,7 +1,7 @@
 {
     "world_settings": {},
     "player": {
-        "position": [-1, 10],
+        "position": [0.5, 10],
         "scale": [0.05, 0.05],
         "color": [0.0, 0.0, 0.0, 1.0],
         "health": 10
