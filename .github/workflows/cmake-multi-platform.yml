@@ -103,7 +103,7 @@ jobs:
       env:
         cache-name: cache-vcpkg
       with:
-        path: ${{ runner.os == 'Windows' && format('%LOCALAPPDATA%\vcpkg\archives') || '~/.cache/vcpkg/archives/' }}
+        path: ${{ runner.os == 'Windows' && format('{0}\vcpkg\archives', env.LOCALAPPDATA) || '~/.cache/vcpkg/archives' }}
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/vcpkg.json') }}
 
     - name: CMake - Configure
