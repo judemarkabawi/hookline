@@ -1,5 +1,11 @@
 #pragma once
 
+enum class CollectableType {
+    Default,  // Existing collectible
+    Feather,
+    Potion,
+};
+
 struct CollectableComponent {
-    bool dummy = false;
+    CollectableType type = CollectableType::Default;
 };

@@ -100,6 +100,9 @@ void Game::update(float dt) {
     }
     auto &health = registry.get<HealthComponent>(player_.entity);
     if (health.health <= 0) {
+        if(grapple.attached){
+            grapple.detach();
+        }
         registry.remove<RigidBodyComponent>(player_.entity);
         registry.remove<RenderComponent>(player_.entity);
         if (registry.all_of<ColliderComponent>(player_.entity)) {
@@ -109,10 +112,10 @@ void Game::update(float dt) {
 
     // System updates
     physics.update(dt, registry);
-    collisions.update(dt, registry);
     camera_system->update(dt, registry);
     collectables.update(dt, registry, player_.entity);
     projectileSystem.update(dt, registry, player_.entity);
+    collisions.update(dt, registry);
 }
 
 void Game::render(glm::uvec2 drawable_size) {
@@ -206,10 +209,12 @@ void Game::setup_map() {
     }
 
     // Spawn some collectables
-    {
+    { 
+        /*
         for (size_t i = 0; i < 20; ++i) {
             collectables.spawn_random(registry);
         }
+        */
     }
 }
 

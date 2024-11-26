@@ -21,3 +21,13 @@ ColliderComponent &ColliderComponent::set_hookable(bool hookable) {
     this->hookable = hookable;
     return *this;
 }
+
+ColliderComponent &ColliderComponent::set_breakable(bool breakable) {
+    this->is_breakable = breakable;
+    return *this;
+}
+
+ColliderComponent &ColliderComponent::set_damaging(bool damaging) {
+    this->is_damaging = damaging;
+    return *this;
+}
