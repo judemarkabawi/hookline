@@ -8,6 +8,7 @@
 
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
+#include <SDL_render.h>
 
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
@@ -17,6 +18,7 @@
 #include "core/InputComponent.hpp"
 #include "core/Level.hpp"
 #include "core/TransformComponent.hpp"
+#include "core/text/TextComponent.hpp"
 #include "gameplay/HealthComponent.hpp"
 #include "gameplay/ProjectileSystem.hpp"
 #include "physics/ColliderComponent.hpp"
@@ -34,6 +36,10 @@ Game::Game() : collectables(&asset_manager), projectileSystem(&asset_manager) {
     setup_map();
 
     setup_camera();
+
+    auto test = registry.create();
+    registry.emplace<TextComponent>(
+        test, TextComponent::from_text("Hi how are you", {0.5, -0.5}, 1.0f));
 
     // Play music
     Sound::loop(asset_manager.get_sound("guitar_loop_music"), 0.25);
@@ -128,7 +134,8 @@ bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
             player_.down.pressed = true;
             return true;
         } else if (event.key.keysym.sym == SDLK_SPACE) {
-            auto &grapple = registry.get<GrapplingHookComponent>(grapple_entity);
+            auto &grapple =
+                registry.get<GrapplingHookComponent>(grapple_entity);
             grapple.hold(registry);
         }
     } else if (event.type == SDL_KEYUP) {
@@ -145,7 +152,8 @@ bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
             player_.down.pressed = false;
             return true;
         } else if (event.key.keysym.sym == SDLK_SPACE) {
-            auto &grapple = registry.get<GrapplingHookComponent>(grapple_entity);
+            auto &grapple =
+                registry.get<GrapplingHookComponent>(grapple_entity);
             grapple.unhold();
         }
     } else if (event.type == SDL_MOUSEBUTTONDOWN) {
@@ -160,7 +168,7 @@ bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
         if (event.button.button == SDL_BUTTON_LEFT) {
             player_.mouse.pressed = false;
         }
-    } 
+    }
     return false;
 }
 

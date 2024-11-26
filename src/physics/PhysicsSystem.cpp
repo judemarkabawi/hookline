@@ -13,7 +13,8 @@ void PhysicsSystem::update(float dt, entt::registry& registry) {
     for (auto [_, grapple] : registry.view<GrapplingHookComponent>().each()) {
         if (grapple.attached) {
             auto [player_transform, player_forces, player_rigidBody] =
-                registry.get<TransformComponent, ForceComponent, RigidBodyComponent>(grapple.user);
+                registry.get<TransformComponent, ForceComponent,
+                             RigidBodyComponent>(grapple.user);
 
             // Add pulling force
             glm::vec2 grapple_direction = glm::normalize(
@@ -22,8 +23,7 @@ void PhysicsSystem::update(float dt, entt::registry& registry) {
                 float cosTheta = -grapple_direction.y;
                 float tension = player_rigidBody.mass * hookline::g / cosTheta;
                 player_forces.add_force(grapple_direction * tension);
-            }
-            else if (grapple.attached)
+            } else if (grapple.attached)
                 player_forces.add_force(grapple_direction * grapple.pull_force);
 
             // Deactive grapple when close

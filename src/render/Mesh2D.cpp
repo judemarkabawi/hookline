@@ -7,6 +7,36 @@ Mesh2D Mesh2D::from_verts(std::vector<Vertex> verts) {
     return result;
 }
 
+/**
+ * Make a new RenderComponent using vertices and a (default) color.
+ */
+Mesh2D Mesh2D::from_verts_color(const std::vector<glm::vec2> &vertices,
+                                glm::vec4 color) {
+    std::vector<Vertex> verts;
+    for (glm::vec2 vertex_pos : vertices) {
+        Vertex vertex{vertex_pos, glm::vec2{0.0f, 0.0f}, color};
+        verts.push_back(vertex);
+    }
+    return Mesh2D::from_verts(std::move(verts));
+}
+
+/**
+ * Make a new RenderComponent using vertices and a texture;
+ */
+Mesh2D Mesh2D::from_verts_texture(const std::vector<glm::vec2> &vertices,
+                                  const std::vector<glm::vec2> &tex_coords) {
+    assert(vertices.size() == tex_coords.size() &&
+           "RenderComponent: Cannot construct with different length vertices "
+           "and tex_coords");
+
+    std::vector<Vertex> verts;
+    for (size_t i = 0; i < vertices.size(); ++i) {
+        Vertex vertex{vertices[i], tex_coords[i], {0.0f, 0.0f, 0.0f, 1.0f}};
+        verts.push_back(vertex);
+    }
+    return Mesh2D::from_verts(std::move(verts));
+}
+
 Mesh2D::~Mesh2D() { cleanup(); }
 
 Mesh2D::Mesh2D(Mesh2D &&other)

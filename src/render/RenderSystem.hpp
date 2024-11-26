@@ -5,6 +5,7 @@
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 
+#include "core/text/TextRenderer.hpp"
 #include "shader/CyberpunkBackgroundShader.hpp"
 
 /**
@@ -16,11 +17,14 @@
  */
 class RenderSystem {
    public:
+    RenderSystem();
+
     void render(glm::uvec2 drawable_size, entt::registry &registry,
                 entt::entity camera);
 
    private:
     void render_background(glm::uvec2 drawable_size);
+    void render_text(glm::uvec2 drawable_size, entt::registry &registry);
 
     struct CyberpunkBackground {
         CyberpunkBackgroundShader shader;
@@ -35,9 +39,10 @@ class RenderSystem {
         CyberpunkBackground &operator=(const CyberpunkBackground &other) =
             delete;
 
-        CyberpunkBackground(const CyberpunkBackground &&other) = delete;
-        CyberpunkBackground &operator=(const CyberpunkBackground &&other) =
-            delete;
+        CyberpunkBackground(CyberpunkBackground &&other) = delete;
+        CyberpunkBackground &operator=(CyberpunkBackground &&other) = delete;
     };
+
     CyberpunkBackground background_;
+    TextRenderer text_renderer;
 };

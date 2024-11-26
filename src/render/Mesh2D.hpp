@@ -13,6 +13,10 @@ struct Mesh2D {
 
     /* Constructors */
     static Mesh2D from_verts(std::vector<Vertex> vertices);
+    static Mesh2D from_verts_color(const std::vector<glm::vec2> &vertices,
+                                   glm::vec4 color);
+    static Mesh2D from_verts_texture(const std::vector<glm::vec2> &vertices,
+                                     const std::vector<glm::vec2> &tex_coords);
 
     Mesh2D() = default;
     ~Mesh2D();
