@@ -8,6 +8,7 @@
 #include "core/TransformComponent.hpp"
 #include "render/RenderComponent.hpp"
 #include "util/misc.hpp"
+#include "constants.hpp"
 
 CollectableSystem::CollectableSystem(AssetManager *asset_manager)
     : asset_manager_(asset_manager) {}
@@ -34,10 +35,13 @@ void CollectableSystem::spawn(entt::registry &registry, glm::vec2 position) {
         collectable,
         TransformComponent(position, glm::vec2{0.025f, 0.025f}, 0.0f));
     registry.emplace<CollectableComponent>(collectable);
+
+    std::vector<glm::vec2> points = hookline::get_basic_shape_debug(1.0 / hookline::collectible_glow_ratio);
+
     registry.emplace<RenderComponent>(
         collectable,
-        RenderComponent::from_vertices_color(hookline::get_basic_shape_debug(),
-                                             {0.96, 0.48, 0.16, 1.0}));
+        RenderComponent::from_vertices_color_tex(points, {0.96, 0.48, 0.16, 1.0}, 
+               hookline::get_basic_uvs_debug(), RenderComponent::RenderType::COLLECTIBLE));
 }
 
 void CollectableSystem::spawn_random(entt::registry &registry) {

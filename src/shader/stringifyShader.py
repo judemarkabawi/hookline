@@ -1,120 +1,126 @@
 import string
 
-input = '''#version 330
-in vec2 a_position;
-in vec2 a_texture_coord;
-in vec4 a_color;
-uniform vec2 u_position;                 // from transform
-uniform vec2 u_scale;                    // from transform
-uniform float u_rotation;                // from transform
-uniform vec2 u_camera_position;          // from camera
-uniform vec2 u_camera_viewport_size;     // from camera
-uniform float u_camera_pixels_per_unit;  // from camera
-out vec2 texture_coord;
-out vec4 color;
-        
-void main() {
-    mat2 rotation_matrix =
-    mat2(cos(u_rotation),-sin(u_rotation),
-        sin(u_rotation),cos(u_rotation));
-    vec2 world_position = rotation_matrix * (a_position * u_scale) + u_position;
-    vec2 camera_space_position = (world_position - u_camera_position) * u_camera_pixels_per_unit;
-    vec2 clip_space_position = (camera_space_position / u_camera_viewport_size) * 2.0;
-    gl_Position = vec4(clip_space_position, 0.0, 1.0);
-    texture_coord = a_texture_coord;
-    color = a_color;
-}
-
+input = '''
 #version 330
 in vec2 texture_coord;
 in vec4 color;
-uniform vec2 u_player_position; 
-uniform sampler2D u_frag_texture;
-uniform float u_time; 
-uniform bool u_frag_use_texture;
-out vec4 FragColor;
+uniform float u_time;
+uniform vec2 u_drawable_size"
+uniform float u_size_ratio;
 
-vec3 palette(float t) {    
-    vec3 a = vec3(0.508, 0.500, 0.508);    
-    vec3 b = vec3(-0.482, 0.478, 0.418);   
-    vec3 c = vec3(0.558, 1.000, 1.000);    
-    vec3 d = vec3(0.138, -0.592, 0.667);   
-    return a + b*cos( 6.283185*(c*t+d));   
-}  
-   
-float sdBox( in vec2 p, in vec2 b )    
-{  
-    vec2 d = abs(p)-b; 
-    return length(max(d,0.0)) + min(max(d.x,d.y),0.0); 
-}  
+//conversion functions from
+//https://gist.github.com/983/e170a24ae8eba2cd174f
+vec3 rgb2hsv(vec3 c)
+{
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
 
-void main()    
-{  
-    // Normalized pixel coordinates (from 0 to 1)  
-    vec2 uv = 2.0*texture_coord - 1.0; 
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+vec3 hsv2rgb(vec3 c)
+{
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+// The MIT License
+// Copyright © 2019 Inigo Quilez
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+// Distance to a regular pentagon, without trigonometric functions. 
+
+// List of some other 2D distances: https://www.shadertoy.com/playlist/MXdSRf
+//
+// and iquilezles.org/articles/distfunctions2d
+
+float sdHexagram( in vec2 p, in float r )
+{
+    const vec4 k = vec4(-0.5,0.86602540378,0.57735026919,1.73205080757);
     
-    float d = sdBox(uv, vec2(1.0, 1.0));   
-    d = -d;    
+    p = abs(p);
+    p -= 2.0*min(dot(k.xy,p),0.0)*k.xy;
+    p -= 2.0*min(dot(k.yx,p),0.0)*k.yx;
+    p -= vec2(clamp(p.x,r*k.z,r*k.w),r);
+    return length(p)*sign(p.y);
+}
+
+
+void main()
+{
+    vec4 glow_col = color;
     
-    vec3 normal = vec3(0.0);   
-    vec3 lightPos = vec3(0.5, 0.5, 0.5);   
+    // Normalized pixel coordinates (from 0 to 1)
+    float minR = min(u_drawable_size.x, u_drawable_size.y);
+    vec2 uvFixed = (gl_FragCoord.xy/minR)*2.0 - u_drawable_size.xy/minR;
+    vec2 uvStretched = (gl_FragCoord.xy/u_drawable_size.xy)*2.0 - 1.0;
     
-    float extent = 0.25;   
-    float z = max(extent * d, 0.0);    
-    vec3 lightRay = normalize(u_player_position - vec3(gl_FragCoord.xy, z)); 
+    float d = length(uvStretched);
+    float d_fixed = length(uvFixed);
     
-    float top = float(uv.x < uv.y)*float(uv.x > -uv.y);    
-    float left = float(uv.x < uv.y)*float(uv.x < -uv.y);   
-    float right = float(uv.x > uv.y)*float(uv.x > -uv.y);  
-    float bot = float(uv.x > uv.y)*float(uv.x < -uv.y);    
+    float haloD = d - u_size_ratio;
+    haloD = abs(haloD)/(1.25*u_size_ratio);
+    haloD = 0.2/haloD;
+
+    //little star effects
+    float starR = u_size_ratio * 1.5;
+    float starD = sdHexagram(uvFixed, starR);
+    starD = abs(starD)/starR;
+    starD = (sin(starD*(1.0/(3.0*starR)) - u_time*1.5) + 1.0)/1.5;
+    starD = 0.3 / (starD+0.3);
+    starD = pow(starD, 0.5);
+    starD *= 0.4;
     
-    vec3 topNorm = vec3(0.0, 0.5, 0.5);    
-    vec3 botNorm = vec3(0.0, -0.5, 0.5);   
-    vec3 leftNorm = vec3(-0.5, 0.0, 0.5);  
-    vec3 rightNorm = vec3(0.5, 0.0, 0.5);  
+    float ITERATIONS = 6.0;
+    for(float i = 0.0; i < ITERATIONS; i++) {
+       float r = u_size_ratio;
+       float s = 0.5;
+       float twoPi = 2.0*3.131592;
+       vec2 uvFixed0 = uvFixed;
+       uvFixed0 *= s;
+       float angle = twoPi*(i/ITERATIONS);
+       uvFixed0 += vec2(cos(angle), sin(angle))*r;
+       
+        float newStarR = starR*s;
+        float newStarD = sdHexagram(uvFixed0, newStarR);
+        newStarD = abs(newStarD)/newStarR;
+        newStarD = (sin(newStarD*(1.0/(3.0*newStarR)) - u_time*1.5 + 1.7) + 1.0)/1.5;
+        newStarD = 0.3 / (newStarD+0.3);
+        newStarD = pow(newStarD, 0.5);
+        //newStarD *= 0.4;
+        starD = max(starD, newStarD);
+    }
+    starD = clamp(starD, 0.0, 1.0);
+    starD *= 0.6*min(exp(-5.0*(d_fixed-0.15)), 1.0);
     
-    vec3 norm = normalize(top*topNorm + bot*botNorm + left*leftNorm + right*rightNorm);    
+    float bloomGlow = (sin(d*(1.0/u_size_ratio) - u_time) + 1.0)/2.0;
+    bloomGlow = pow(bloomGlow, 1.0);
+    bloomGlow = 0.5/(bloomGlow+0.6);
+    bloomGlow = pow(bloomGlow, 2.0);
+    bloomGlow = clamp(bloomGlow, 0.0, 1.0);
+    bloomGlow *= 0.3;
     
-    float lighting = max(0.0, dot(lightRay, norm));    
-    lighting *= 0.7;   
-    lighting += 0.2;   
+    float lightness = bloomGlow + haloD + starD;
+     
+    vec3 hsv = rgb2hsv(glow_col.xyz);
+    hsv.x += d*0.8 - starD*0.2;
+    hsv.y *= 0.6;
+    hsv.z *= 0.9;
+    vec3 col = hsv2rgb(hsv);
+    col += 0.1;
+    col = vec3(pow(col.x, 0.9), pow(col.y, 0.9), pow(col.z, 0.9));
     
-    float M_PI = 3.14159265358;    
     
-    float b = d;   
-    //light rings  
-    d = (0.4*d - 0.1*(length(uv)/0.5));    
-    float angle = atan(uv.y, uv.x) + M_PI; 
-    
-    float off = (sin(angle*1.0 + u_time)/80.0)*(cos(20.0*angle + 5.0 + 
-    5.0*u_time)/2.0); 
-    d+= off;   
-    
-    float off2 = (sin(3.5*angle*1.0 + u_time)/80.0)*(cos(12.0*angle + 5.0 
-    + 5.0*u_time)/2.0);    
-    b += off2; 
-    b = smoothstep(0.0, 0.2, b);   
-    b = 0.1 / b;   
-    
-    d = sin(20.0*d + 2.0*u_time)/20.0;  
-    d = abs(d);    
-    d = smoothstep(0.0, 0.03, d);  
-    d = 0.125 / d; 
-    
-    float highlight = d + b;   
-    vec3 highlight_col = palette(length(uv))*highlight;    
-    
-    vec3 baseColor = vec3(0.4, 0.8, 0.9);  
-    if (u_frag_use_texture) {  
-        baseColor = texture(u_frag_texture, texture_coord);    
-    } else {   
-        baseColor = color; 
-    }  
-    
-    vec3 col = vec3(lighting)*baseColor + highlight_col*0.8;   
-   
-    // Output to screen    
-    FragColor = vec4(col, 1.0);
+     
+    col *= lightness;
+    col *= (1.0 - pow((d_fixed+d)/2.0, 5.0)); //falloff towards edge
+ 
+    // Output to screen
+    FragColor = vec4(col, clamp(lightness, 0.0, 1.0));
 }'''
 
 ret_str = ""
@@ -128,25 +134,3 @@ for str in input.split('\n'):
 
 
 print(ret_str)
-
-
-'''
-"#version 330\n"
-"in vec2 texture_coord;\n"
-"in vec4 color;\n"
-"uniform vec2 u_player_position; \n"
-"uniform sampler2D u_frag_texture;\n"
-"uniform float u_time; \n"
-"uniform bool u_frag_use_texture;\n"
-"out vec4 FragColor;\n"
-"\n"
-"\n"
-"void main()    \n"
-"{  \n"
-"    FragColor = vec4(1.0) \n"
-"}\n"
-
-
-
-
-'''

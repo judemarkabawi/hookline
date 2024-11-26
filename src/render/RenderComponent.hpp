@@ -24,6 +24,7 @@ class RenderComponent {
     enum RenderType{
         BASE,
         GRAPPLE_POINT,
+        COLLECTIBLE,
         PLAYER
     };
 

@@ -14,6 +14,7 @@
 #include "render/RenderComponent.hpp"
 #include "shader/CyberpunkBackgroundShaderFull.hpp"
 #include "util/misc.hpp"
+#include "constants.hpp"
 
 RenderSystem::RenderSystem() {
     glEnable(GL_BLEND);
@@ -57,15 +58,24 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
             mesh_shader.updateUniforms(transform.position, transform.scale, transform.rotation,
                                        camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
                                        renderable.use_texture_, renderable.texture_);
-        } else if (RenderComponent::RenderType::GRAPPLE_POINT) {
+        } else if (renderable.type == RenderComponent::RenderType::GRAPPLE_POINT) {
             glUseProgram(grapple_shader.m.program);
             grapple_shader.updateUniforms(transform.position, transform.scale, transform.rotation,
                                        camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
                                        renderable.use_texture_, renderable.texture_, u_time);
+        } else if (renderable.type == RenderComponent::RenderType::COLLECTIBLE) {
+            glUseProgram(collectible_shader.m.program);
+            collectible_shader.updateUniforms(transform.position, transform.scale, transform.rotation,
+                                          camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
+                                          drawable_size, u_time, hookline::collectible_glow_ratio);
+            glBlendFunc(GL_ONE, GL_ONE);
         }
 
         // Draw
         glDrawArrays(GL_TRIANGLE_STRIP, 0, verts_.size());
+        if(renderable.type == RenderComponent::RenderType::COLLECTIBLE) {
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
     }
 
     render_text(drawable_size, registry);
