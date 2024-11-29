@@ -114,8 +114,8 @@ add_custom_target(format
 if (UNIX)
     install(TARGETS ${PROJECT_NAME}
             DESTINATION game/game/bin
-            RUNTIME_DEPENDENCIES
-            POST_EXCLUDE_REGEXES "libc\.so\..*"
+            # RUNTIME_DEPENDENCIES
+            # POST_EXCLUDE_REGEXES "libc\.so\..*"
     )
 else()
     install(TARGETS ${PROJECT_NAME}
