@@ -18,8 +18,6 @@
 #include "physics/PhysicsSystem.hpp"
 #include "render/CameraSystem.hpp"
 #include "render/RenderSystem.hpp"
-#include "shader/CyberpunkBackgroundShader.hpp"
-#include "shader/CyberpunkBackgroundShaderNew.hpp"
 
 /**
  * Main Game class

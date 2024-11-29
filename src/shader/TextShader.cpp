@@ -1,36 +1,13 @@
 #include "TextShader.hpp"
 
+#include "shader/util.hpp"
 #include "util/gl_compile_program.hpp"
 
 TextShader::TextShader() {
-    m.program = gl_compile_program(
-        // Vertex shader
-        R"(
-        #version 330
-        layout(location = 0) in vec2 a_position;
-        layout(location = 1) in vec2 a_texture_coord;
-        layout(location = 2) in vec4 a_color;
-        uniform vec2 u_position;  // from transform
-        out vec2 texture_coord;
-
-        void main() {
-            vec2 world_position = a_position + u_position;
-            gl_Position = vec4(world_position, 0.0, 1.0);
-
-            texture_coord = a_texture_coord;
-        }
-        )",
-        // Fragment shader
-        R"(
-        #version 330
-        in vec2 texture_coord;
-        uniform sampler2D u_frag_texture;
-        out vec4 FragColor;
-        
-        void main() {
-            FragColor = vec4(1.0, 1.0, 1.0, texture(u_frag_texture, texture_coord).r);
-        }
-        )");
+    ShaderSource shader_source =
+        hookline::load_shader_file("TextShader.vert", "TextShader.frag");
+    m.program = gl_compile_program(shader_source.vertex_source,
+                                   shader_source.fragment_source);
 
     m.a_position_loc = glGetAttribLocation(m.program, "a_position");
     m.a_texture_coord_loc = glGetAttribLocation(m.program, "a_texture_coord");
