@@ -6,6 +6,9 @@ release/
 # clangd
 .cache/
 
+# Mac people
+*.DS_Store
+
 #----------------------------------#
 # Visual Studio Template .gitignore
 #----------------------------------#
