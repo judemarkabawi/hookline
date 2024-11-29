@@ -2,7 +2,6 @@
 
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
-#include "CollectableComponent.hpp"
 
 #include "core/AssetManager.hpp"
 
@@ -28,7 +27,6 @@ class ProjectileSystem {
                                 float projectile_speed,
                                 float projectile_lifetime,
                                 entt::registry &registry);
-
 
    private:
     bool check_collision(const glm::vec2 &projectile_pos,

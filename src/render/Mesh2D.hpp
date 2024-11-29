@@ -17,7 +17,8 @@ struct Mesh2D {
                                    glm::vec4 color);
     static Mesh2D from_verts_texture(const std::vector<glm::vec2> &vertices,
                                      const std::vector<glm::vec2> &tex_coords,
-                                     glm::vec4 color = glm::vec4(0.0, 0.0, 0.0, 1.0));
+                                     glm::vec4 color = glm::vec4(0.0, 0.0, 0.0,
+                                                                 1.0));
 
     Mesh2D() = default;
     ~Mesh2D();

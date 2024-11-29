@@ -9,11 +9,10 @@
 #include "core/AssetManager.hpp"
 #include "core/InputComponent.hpp"
 #include "core/TransformComponent.hpp"
-#include "gameplay/HealthComponent.hpp"
 #include "gameplay/CollectableComponent.hpp"
 #include "gameplay/CollectableSystem.hpp"
+#include "gameplay/HealthComponent.hpp"
 #include "gameplay/ProjectileSpawnerComponent.hpp"
-#include "gameplay/ProjectileSystem.hpp"
 #include "physics/ColliderComponent.hpp"
 #include "physics/ForceComponent.hpp"
 #include "physics/GrapplingHook.hpp"
@@ -28,20 +27,25 @@ namespace {
     Helper to make a manually defined box on the map.
  */
 entt::entity create_box(entt::registry &registry, glm::vec2 position,
-                        glm::vec2 scale, bool hookable, bool breakable, bool damaging, glm::vec4 color) {
+                        glm::vec2 scale, bool hookable, bool breakable,
+                        bool damaging, glm::vec4 color) {
     auto box = registry.create();
     registry.emplace<TransformComponent>(
         box, TransformComponent(position, scale, 0.0f));
     registry.emplace<RigidBodyComponent>(box);
-    registry.emplace<ColliderComponent>(
-        box, ColliderComponent().set_can_move(false).set_hookable(hookable).set_breakable(breakable).set_damaging(damaging));
-     RenderComponent::RenderType type = RenderComponent::RenderType::BASE;
-    if(hookable) {
+    registry.emplace<ColliderComponent>(box, ColliderComponent()
+                                                 .set_can_move(false)
+                                                 .set_hookable(hookable)
+                                                 .set_breakable(breakable)
+                                                 .set_damaging(damaging));
+    RenderComponent::RenderType type = RenderComponent::RenderType::BASE;
+    if (hookable) {
         type = RenderComponent::RenderType::GRAPPLE_POINT;
     }
     registry.emplace<RenderComponent>(
         box, RenderComponent::from_vertices_color_tex(
-                 hookline::get_basic_shape_debug(), color, hookline::get_basic_uvs_debug(), type));
+                 hookline::get_basic_shape_debug(), color,
+                 hookline::get_basic_uvs_debug(), type));
     return box;
 }
 
@@ -55,14 +59,14 @@ entt::entity create_hookable_breakable(entt::registry &registry, glm::vec2 posit
 }
 #endif
 
-
-
-entt::entity create_collectable(entt::registry &registry, glm::vec2 position, CollectableType type) {
+entt::entity create_collectable(entt::registry &registry, glm::vec2 position,
+                                CollectableType type) {
     auto collectable = registry.create();
     registry.emplace<TransformComponent>(
         collectable,
         TransformComponent(position, glm::vec2{0.025f, 0.025f}, 0.0f));
-    registry.emplace<CollectableComponent>(collectable, CollectableComponent{type});
+    registry.emplace<CollectableComponent>(collectable,
+                                           CollectableComponent{type});
 
     // Assign color based on collectible type
     glm::vec4 color;
@@ -79,8 +83,8 @@ entt::entity create_collectable(entt::registry &registry, glm::vec2 position, Co
     }
 
     registry.emplace<RenderComponent>(
-        collectable,
-        RenderComponent::from_vertices_color(hookline::get_basic_shape_debug(), color));
+        collectable, RenderComponent::from_vertices_color(
+                         hookline::get_basic_shape_debug(), color));
 
     return collectable;
 }
@@ -90,9 +94,9 @@ void load_spike_terrain(const json &data, Level &level) {
     for (const auto &entry : spike_terrain) {
         glm::vec2 position(entry[0][0].get<float>(), entry[0][1].get<float>());
         glm::vec2 scale(entry[1][0].get<float>(), entry[1][1].get<float>());
-        create_box(level.registry, position, scale, false, false, true, glm::vec4{0.8f, 0.f, 0.f, 1.0f});
+        create_box(level.registry, position, scale, false, false, true,
+                   glm::vec4{0.8f, 0.f, 0.f, 1.0f});
     }
-        
 }
 
 void load_terrain(const json &data, Level &level) {
@@ -100,9 +104,9 @@ void load_terrain(const json &data, Level &level) {
     for (const auto &entry : terrain) {
         glm::vec2 position(entry[0][0].get<float>(), entry[0][1].get<float>());
         glm::vec2 scale(entry[1][0].get<float>(), entry[1][1].get<float>());
-        create_box(level.registry, position, scale, false, false, false, glm::vec4{0.2f, 0.2f, 0.2f, 1.0f});
+        create_box(level.registry, position, scale, false, false, false,
+                   glm::vec4{0.2f, 0.2f, 0.2f, 1.0f});
     }
-        
 }
 
 void load_map(const json &data, Level &level) {
@@ -115,7 +119,8 @@ void load_map(const json &data, Level &level) {
     for (const auto &entry : hookable_unbreakable) {
         glm::vec2 position(entry[0][0].get<float>(), entry[0][1].get<float>());
         glm::vec2 scale(entry[1][0].get<float>(), entry[1][1].get<float>());
-        create_box(level.registry, position, scale, true, false, false, glm::vec4{0.07f, 0.11f, 0.23f, 1.0f});
+        create_box(level.registry, position, scale, true, false, false,
+                   glm::vec4{0.07f, 0.11f, 0.23f, 1.0f});
     }
 
     // Hookable breakable objects
@@ -123,29 +128,38 @@ void load_map(const json &data, Level &level) {
     for (const auto &entry : hookable_breakable) {
         glm::vec2 position(entry[0][0].get<float>(), entry[0][1].get<float>());
         glm::vec2 scale(entry[1][0].get<float>(), entry[1][1].get<float>());
-        create_box(level.registry, position, scale, true, true, false, glm::vec4{0.55f, 0.27f, 0.07f, 1.0f});
+        create_box(level.registry, position, scale, true, true, false,
+                   glm::vec4{0.55f, 0.27f, 0.07f, 1.0f});
     }
 }
 void load_projectiles(const json &data, Level &level) {
     auto &projectiles = data["projectiles"];
 
     auto create_projectile_spawner = [&](SpawnerType type, const json &entry) {
-        glm::vec2 position(entry[0][0].get<float>(), entry[0][1].get<float>()); // Transform position
-        glm::vec2 position_range(entry[1][0].get<float>(), entry[1][1].get<float>()); // Range (horizontal/vertical)
+        glm::vec2 position(entry[0][0].get<float>(),
+                           entry[0][1].get<float>());  // Transform position
+        glm::vec2 position_range(
+            entry[1][0].get<float>(),
+            entry[1][1].get<float>());  // Range (horizontal/vertical)
         float interval = entry[2].get<float>();
         float small_interval = entry[3].get<float>();
         int burst_count = entry[4].get<int>();
         float projectile_speed = entry[5].get<float>();
         float projectile_lifetime = entry[6].get<float>();
-        int projectile_count = (type == SpawnerType::Spray) ? entry[7].get<int>() : 1;
-        float trigger_height = (type == SpawnerType::Chasing || type == SpawnerType::Spray) ? entry[8].get<float>() : 0;
+        int projectile_count =
+            (type == SpawnerType::Spray) ? entry[7].get<int>() : 1;
+        float trigger_height =
+            (type == SpawnerType::Chasing || type == SpawnerType::Spray)
+                ? entry[8].get<float>()
+                : 0;
 
         auto spawner = level.registry.create();
         level.registry.emplace<ProjectileSpawnerComponent>(
-            spawner, type, position_range, interval, small_interval, burst_count,
-            projectile_speed, projectile_lifetime, projectile_count, trigger_height);
-        level.registry.emplace<TransformComponent>(
-            spawner, position, glm::vec2{0.0f, 0.0f});
+            spawner, type, position_range, interval, small_interval,
+            burst_count, projectile_speed, projectile_lifetime,
+            projectile_count, trigger_height);
+        level.registry.emplace<TransformComponent>(spawner, position,
+                                                   glm::vec2{0.0f, 0.0f});
     };
 
     if (projectiles.contains("Horizontal")) {
@@ -172,7 +186,6 @@ void load_projectiles(const json &data, Level &level) {
         }
     }
 }
-
 
 void load_player(const json &data, Level &level) {
     auto position = data["player"]["position"];
@@ -202,7 +215,8 @@ void load_player(const json &data, Level &level) {
         player, ColliderComponent().set_hookable(false));
     registry.emplace<RenderComponent>(
         player, RenderComponent::from_vertices_color_tex(
-                    hookline::get_basic_shape_debug(), color_vec, hookline::get_basic_uvs_debug(),
+                    hookline::get_basic_shape_debug(), color_vec,
+                    hookline::get_basic_uvs_debug(),
                     RenderComponent::RenderType::PLAYER));
     registry.emplace<InputComponent>(player);
     registry.emplace<HealthComponent>(player, HealthComponent(health));
@@ -237,9 +251,6 @@ void load_collectables(const json &data, Level &level) {
     }
 }
 
-
-
-
 }  // namespace
 
 Level Level::load_json(const std::string &filename) {
@@ -256,7 +267,6 @@ Level Level::load_json(const std::string &filename) {
 
     std::cout << "Loading map..." << "\n";
     load_map(data, level);
-    
 
     std::cout << "Loading player..." << "\n";
     load_player(data, level);

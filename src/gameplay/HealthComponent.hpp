@@ -11,5 +11,5 @@ struct HealthComponent {
 
     void take_damage(int amount) { health = glm::max(0, health - amount); }
 
-    void heal(int amount) {health = health + amount;}
+    void heal(int amount) { health = health + amount; }
 };

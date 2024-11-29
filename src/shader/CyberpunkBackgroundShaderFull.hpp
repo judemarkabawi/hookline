@@ -15,7 +15,8 @@ class CyberpunkBackgroundShaderFull {
         const CyberpunkBackgroundShaderFull& other) = delete;
 
     // Move operators
-    CyberpunkBackgroundShaderFull(CyberpunkBackgroundShaderFull&& other) noexcept;
+    CyberpunkBackgroundShaderFull(
+        CyberpunkBackgroundShaderFull&& other) noexcept;
     CyberpunkBackgroundShaderFull& operator=(
         CyberpunkBackgroundShaderFull&& other) noexcept;
 
@@ -31,7 +32,7 @@ class CyberpunkBackgroundShaderFull {
         GLuint u_drawable_size_loc = -1U;
         GLuint u_camera_pos = -1U;
 
-        //texture locations
+        // texture locations
         GLuint u_bg_emission = -1U;
         GLuint u_bg_color = -1U;
         GLuint u_bg_normal = -1U;

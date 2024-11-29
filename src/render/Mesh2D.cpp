@@ -25,7 +25,7 @@ Mesh2D Mesh2D::from_verts_color(const std::vector<glm::vec2> &vertices,
  */
 Mesh2D Mesh2D::from_verts_texture(const std::vector<glm::vec2> &vertices,
                                   const std::vector<glm::vec2> &tex_coords,
-                                  glm::vec4 color ) {
+                                  glm::vec4 color) {
     assert(vertices.size() == tex_coords.size() &&
            "RenderComponent: Cannot construct with different length vertices "
            "and tex_coords");

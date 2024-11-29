@@ -5,7 +5,7 @@
  */
 
 #include "Game.hpp"
-//#include <iostream>
+// #include <iostream>
 
 #include <GL/glew.h>
 #include <SDL2/SDL.h>
@@ -100,7 +100,7 @@ void Game::update(float dt) {
     }
     auto &health = registry.get<HealthComponent>(player_.entity);
     if (health.health <= 0) {
-        if(grapple.attached){
+        if (grapple.attached) {
             grapple.detach();
         }
         registry.remove<RigidBodyComponent>(player_.entity);
@@ -204,12 +204,12 @@ void Game::setup_map() {
         player_.entity = std::move(level.player);
         grapple_entity = std::move(level.grapple);
 
-        //load bacgrounds shader
+        // load bacgrounds shader
         rendering.load_background_images(&asset_manager);
     }
 
     // Spawn some collectables
-    { 
+    {
         /*
         for (size_t i = 0; i < 20; ++i) {
             collectables.spawn_random(registry);

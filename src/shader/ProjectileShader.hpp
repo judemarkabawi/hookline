@@ -7,6 +7,7 @@
 #pragma once
 
 #include <GL/glew.h>
+
 #include <glm/glm.hpp>
 
 struct ProjectileShader {
@@ -43,8 +44,9 @@ struct ProjectileShader {
         GLuint u_age_loc = 0;
     } m;
 
-    //call after binding vertex arrays
-    void updateUniforms(glm::vec2 user_pos, glm::vec2 u_scale, float u_rotation, 
-                        glm::vec2 camera_pos, glm::vec2 camera_viewport_size, float camera_pixels_per_unit,
-                        float u_time, glm::vec2 movement_vector, float size_ratio, float age);
+    // call after binding vertex arrays
+    void updateUniforms(glm::vec2 user_pos, glm::vec2 u_scale, float u_rotation,
+                        glm::vec2 camera_pos, glm::vec2 camera_viewport_size,
+                        float camera_pixels_per_unit, float u_time,
+                        glm::vec2 movement_vector, float size_ratio, float age);
 };

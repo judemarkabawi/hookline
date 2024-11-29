@@ -6,9 +6,6 @@
 #include <vector>
 
 #include "render/Mesh2D.hpp"
-#include "shader/BasicMeshShader.hpp"
-#include "shader/GrappleBoxShader.hpp"
-#include "shader/CyberpunkBackgroundShaderFull.hpp"
 
 /**
  * RenderComponent holding rendering data like a shader progrma, vertices, etc.
@@ -21,20 +18,13 @@ class RenderComponent {
     /**
      * Make a new RenderComponent using vertices and a (default) color.
      */
-    enum RenderType{
-        BASE,
-        GRAPPLE_POINT,
-        COLLECTIBLE,
-        PROJECTILE,
-        PLAYER
-    };
+    enum RenderType { BASE, GRAPPLE_POINT, COLLECTIBLE, PROJECTILE, PLAYER };
 
     RenderType type = BASE;
 
     static RenderComponent from_vertices_color(
         const std::vector<glm::vec2>& vertices,
-        glm::vec4 color = {0.0f, 0.0f, 0.0f, 1.0f},
-        RenderType type = BASE);
+        glm::vec4 color = {0.0f, 0.0f, 0.0f, 1.0f}, RenderType type = BASE);
     /**
      * Make a new RenderComponent using vertices and a texture;
      */
@@ -43,9 +33,9 @@ class RenderComponent {
         const std::vector<glm::vec2>& tex_coords, GLuint texture,
         RenderType type = BASE);
 
-    static RenderComponent from_vertices_color_tex(const std::vector<glm::vec2>& vertices, 
-                    glm::vec4 color, const std::vector<glm::vec2>& tex_coords,
-                    RenderType type = BASE) ;
+    static RenderComponent from_vertices_color_tex(
+        const std::vector<glm::vec2>& vertices, glm::vec4 color,
+        const std::vector<glm::vec2>& tex_coords, RenderType type = BASE);
 
     ~RenderComponent() = default;
 
@@ -63,6 +53,6 @@ class RenderComponent {
     bool visible_ = true;
     bool use_texture_ = false;
 
-    private:
-        RenderComponent() = default;
+   private:
+    RenderComponent() = default;
 };

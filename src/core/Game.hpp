@@ -41,7 +41,7 @@ class Game {
             glm::vec2 position;
         } mouse;
     } player_;
-    
+
     entt::entity grapple_entity;
     entt::entity camera_entity;
 
@@ -67,8 +67,9 @@ class Game {
     // Start Menu "Mode"
     RenderSystem start_menu_rendering;
 
-    entt::registry start_menu_registry; // for text components, overkill
+    entt::registry start_menu_registry;  // for text components, overkill
     void start_menu_update(float dt);
     void start_menu_render(glm::uvec2 drawable_size);
-    bool start_menu_handle_event(SDL_Event const &event, glm::uvec2 drawable_size);
+    bool start_menu_handle_event(SDL_Event const &event,
+                                 glm::uvec2 drawable_size);
 };

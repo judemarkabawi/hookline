@@ -5,15 +5,15 @@
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 
+#include "core/AssetManager.hpp"
 #include "core/text/TextRenderer.hpp"
+#include "shader/BasicMeshShader.hpp"
+#include "shader/CollectibleShader.hpp"
 #include "shader/CyberpunkBackgroundShader.hpp"
 #include "shader/CyberpunkBackgroundShaderFull.hpp"
-#include "shader/BasicMeshShader.hpp"
 #include "shader/GrappleBoxShader.hpp"
-#include "shader/CollectibleShader.hpp"
-#include "shader/ProjectileShader.hpp"
 #include "shader/PlayerShader.hpp"
-#include "core/AssetManager.hpp"
+#include "shader/ProjectileShader.hpp"
 
 /**
    The RenderSystem is very inefficient right now. It rebinds VAOs and VBOs for
@@ -33,18 +33,18 @@ class RenderSystem {
     void load_background_images(AssetManager *assets);
 
     void render_menu_background(glm::uvec2 drawable_size);
+
    private:
     void render_background(glm::uvec2 drawable_size, glm::vec2 camera_pos);
 
    private:
-
     struct CyberpunkBackground {
         CyberpunkBackgroundShaderFull shader;
         std::vector<glm::vec2> vertices;
         GLuint vao;
         GLuint vbo;
 
-        //textures
+        // textures
         GLuint bg_emission = -1U;
         GLuint bg_color = -1U;
         GLuint bg_normals = -1U;
@@ -80,8 +80,7 @@ class RenderSystem {
         ~MenuBackground();
 
         MenuBackground(const MenuBackground &other) = delete;
-        MenuBackground &operator=(const MenuBackground &other) =
-            delete;
+        MenuBackground &operator=(const MenuBackground &other) = delete;
 
         MenuBackground(MenuBackground &&other) = delete;
         MenuBackground &operator=(MenuBackground &&other) = delete;
@@ -96,5 +95,4 @@ class RenderSystem {
     PlayerShader player_shader;
     CyberpunkBackground background_;
     MenuBackground menu_background_;
-
 };

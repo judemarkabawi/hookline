@@ -9,7 +9,10 @@
 
 class AssetManager {
    public:
-    GLuint load_texture(const std::string &name, const std::string &filename, const GLenum texType = GL_TEXTURE_2D, const GLint filterType = GL_LINEAR_MIPMAP_LINEAR, const GLint verticalWrap = GL_REPEAT);
+    GLuint load_texture(const std::string &name, const std::string &filename,
+                        const GLenum texType = GL_TEXTURE_2D,
+                        const GLint filterType = GL_LINEAR_MIPMAP_LINEAR,
+                        const GLint verticalWrap = GL_REPEAT);
     GLuint get_texture(const std::string &name);
 
     void load_sound(const std::string &name, const std::string &filename);

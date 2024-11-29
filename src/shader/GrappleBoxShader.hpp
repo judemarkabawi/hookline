@@ -7,6 +7,7 @@
 #pragma once
 
 #include <GL/glew.h>
+
 #include <glm/glm.hpp>
 
 struct GrappleBoxShader {
@@ -43,8 +44,9 @@ struct GrappleBoxShader {
         GLuint u_time_loc = 0;
     } m;
 
-    //call after binding vertex arrays
-    void updateUniforms(glm::vec2 user_pos, glm::vec2 u_scale, float u_rotation, 
-                        glm::vec2 camera_pos, glm::vec2 camera_viewport_size, float camera_pixels_per_unit,
-                        int frag_use_texture, GLuint texture, float u_time);
+    // call after binding vertex arrays
+    void updateUniforms(glm::vec2 user_pos, glm::vec2 u_scale, float u_rotation,
+                        glm::vec2 camera_pos, glm::vec2 camera_viewport_size,
+                        float camera_pixels_per_unit, int frag_use_texture,
+                        GLuint texture, float u_time);
 };

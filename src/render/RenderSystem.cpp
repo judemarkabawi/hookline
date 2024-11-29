@@ -6,24 +6,23 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "constants.hpp"
+#include "core/AssetManager.hpp"
 #include "core/TransformComponent.hpp"
 #include "core/text/TextComponent.hpp"
-#include "core/AssetManager.hpp"
+#include "gameplay/HealthComponent.hpp"
+#include "gameplay/ProjectileComponent.hpp"
 #include "render/CameraComponent.hpp"
 #include "render/Mesh2D.hpp"
 #include "render/RenderComponent.hpp"
-#include "gameplay/ProjectileComponent.hpp"
-#include "gameplay/HealthComponent.hpp"
 #include "shader/CyberpunkBackgroundShaderFull.hpp"
 #include "util/misc.hpp"
-#include "constants.hpp"
 
 RenderSystem::RenderSystem() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0, 0, 0, 0);
 }
-
 
 void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
                           entt::entity camera_entity) {
@@ -45,51 +44,66 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
 
         const auto &verts_ = renderable.mesh_.verts;
 
-        //const auto &program_ = renderable.program_;
+        // const auto &program_ = renderable.program_;
 
         // Vertex attribute data
         glBindVertexArray(renderable.mesh_.vao);
 
         using namespace std::chrono;
         static auto start_time = high_resolution_clock::now();
-        auto time_diff = duration_cast<milliseconds>(high_resolution_clock::now() - start_time);
+        auto time_diff = duration_cast<milliseconds>(
+            high_resolution_clock::now() - start_time);
         float time = time_diff.count();
-        float u_time = time/1000.0f; //in seconds
-        if(renderable.type == RenderComponent::RenderType::BASE) {
+        float u_time = time / 1000.0f;  // in seconds
+        if (renderable.type == RenderComponent::RenderType::BASE) {
             glUseProgram(mesh_shader.m.program);
-            mesh_shader.updateUniforms(transform.position, transform.scale, transform.rotation,
-                                       camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
-                                       renderable.use_texture_, renderable.texture_);
-        } else if (renderable.type == RenderComponent::RenderType::GRAPPLE_POINT) {
+            mesh_shader.updateUniforms(
+                transform.position, transform.scale, transform.rotation,
+                camera_transform.position, camera.viewport_size,
+                camera.pixels_per_unit, renderable.use_texture_,
+                renderable.texture_);
+        } else if (renderable.type ==
+                   RenderComponent::RenderType::GRAPPLE_POINT) {
             glUseProgram(grapple_shader.m.program);
-            grapple_shader.updateUniforms(transform.position, transform.scale, transform.rotation,
-                                       camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
-                                       renderable.use_texture_, renderable.texture_, u_time);
-        } else if (renderable.type == RenderComponent::RenderType::COLLECTIBLE) {
+            grapple_shader.updateUniforms(
+                transform.position, transform.scale, transform.rotation,
+                camera_transform.position, camera.viewport_size,
+                camera.pixels_per_unit, renderable.use_texture_,
+                renderable.texture_, u_time);
+        } else if (renderable.type ==
+                   RenderComponent::RenderType::COLLECTIBLE) {
             glUseProgram(collectible_shader.m.program);
-            collectible_shader.updateUniforms(transform.position, transform.scale, transform.rotation,
-                                          camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
-                                          drawable_size, u_time, hookline::collectible_glow_ratio);
+            collectible_shader.updateUniforms(
+                transform.position, transform.scale, transform.rotation,
+                camera_transform.position, camera.viewport_size,
+                camera.pixels_per_unit, drawable_size, u_time,
+                hookline::collectible_glow_ratio);
             glBlendFunc(GL_ONE, GL_ONE);
         } else if (renderable.type == RenderComponent::RenderType::PROJECTILE) {
             glUseProgram(projectile_shader.m.program);
             auto projectile = registry.get<ProjectileComponent>(entity);
-            projectile_shader.updateUniforms(transform.position, transform.scale, 0.0,
-                                            camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
-                                            u_time, projectile.direction, hookline::projectile_glow_ratio, projectile.currtime/projectile.lifetime);
+            projectile_shader.updateUniforms(
+                transform.position, transform.scale, 0.0,
+                camera_transform.position, camera.viewport_size,
+                camera.pixels_per_unit, u_time, projectile.direction,
+                hookline::projectile_glow_ratio,
+                projectile.currtime / projectile.lifetime);
             glBlendFunc(GL_ONE, GL_ONE);
         } else if (renderable.type == RenderComponent::RenderType::PLAYER) {
             glUseProgram(player_shader.m.program);
             auto health = registry.get<HealthComponent>(entity);
-            //printf("%f\n", (float)health.health/(float)health.inital_health);
-            player_shader.updateUniforms(transform.position, transform.scale, transform.rotation,
-                                            camera_transform.position, camera.viewport_size, camera.pixels_per_unit,
-                                            u_time, (float)health.health/(float)health.inital_health);
+            // printf("%f\n", (float)health.health/(float)health.inital_health);
+            player_shader.updateUniforms(
+                transform.position, transform.scale, transform.rotation,
+                camera_transform.position, camera.viewport_size,
+                camera.pixels_per_unit, u_time,
+                (float)health.health / (float)health.inital_health);
         }
 
         // Draw
         glDrawArrays(GL_TRIANGLE_STRIP, 0, verts_.size());
-        if(renderable.type == RenderComponent::RenderType::COLLECTIBLE || renderable.type == RenderComponent::RenderType::PROJECTILE) {
+        if (renderable.type == RenderComponent::RenderType::COLLECTIBLE ||
+            renderable.type == RenderComponent::RenderType::PROJECTILE) {
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         }
     }
@@ -120,26 +134,51 @@ RenderSystem::CyberpunkBackground::CyberpunkBackground() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void RenderSystem::load_background_images(AssetManager* manager) {
-        //load associated textures
-    background_.bg_emission = manager->load_texture("bg_emission", hookline::data_path("../../assets/textures/bg_emission.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
-    background_.bg_color = manager->load_texture("bg_color", hookline::data_path("../../assets/textures/bg_color.png"), GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
-    background_.bg_normals = manager->load_texture("bg_normals", hookline::data_path("../../assets/textures/bg_normals.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+void RenderSystem::load_background_images(AssetManager *manager) {
+    // load associated textures
+    background_.bg_emission = manager->load_texture(
+        "bg_emission",
+        hookline::data_path("../../assets/textures/bg_emission.png"),
+        GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+    background_.bg_color = manager->load_texture(
+        "bg_color", hookline::data_path("../../assets/textures/bg_color.png"),
+        GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
+    background_.bg_normals = manager->load_texture(
+        "bg_normals",
+        hookline::data_path("../../assets/textures/bg_normals.png"),
+        GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
 
-    background_.mg_emission = manager->load_texture("bg_emission", hookline::data_path("../../assets/textures/bg_emission.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
-    background_.mg_color = manager->load_texture("bg_color", hookline::data_path("../../assets/textures/bg_color.png"), GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
-    background_.mg_normals = manager->load_texture("bg_normals", hookline::data_path("../../assets/textures/bg_normals.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+    background_.mg_emission = manager->load_texture(
+        "bg_emission",
+        hookline::data_path("../../assets/textures/bg_emission.png"),
+        GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+    background_.mg_color = manager->load_texture(
+        "bg_color", hookline::data_path("../../assets/textures/bg_color.png"),
+        GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
+    background_.mg_normals = manager->load_texture(
+        "bg_normals",
+        hookline::data_path("../../assets/textures/bg_normals.png"),
+        GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
 
-    background_.fg_emission = manager->load_texture("fg_emission", hookline::data_path("../../assets/textures/fg_emission.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
-    background_.fg_color = manager->load_texture("fg_color", hookline::data_path("../../assets/textures/fg_color.png"), GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
-    background_.fg_normals = manager->load_texture("fg_normals", hookline::data_path("../../assets/textures/fg_normals.png"), GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+    background_.fg_emission = manager->load_texture(
+        "fg_emission",
+        hookline::data_path("../../assets/textures/fg_emission.png"),
+        GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
+    background_.fg_color = manager->load_texture(
+        "fg_color", hookline::data_path("../../assets/textures/fg_color.png"),
+        GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
+    background_.fg_normals = manager->load_texture(
+        "fg_normals",
+        hookline::data_path("../../assets/textures/fg_normals.png"),
+        GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
 
-    background_.bg_cube = manager->load_texture("bg_cube_", hookline::data_path("../../assets/textures/bg_cube_"), GL_TEXTURE_CUBE_MAP, GL_LINEAR, GL_REPEAT);
-
+    background_.bg_cube = manager->load_texture(
+        "bg_cube_", hookline::data_path("../../assets/textures/bg_cube_"),
+        GL_TEXTURE_CUBE_MAP, GL_LINEAR, GL_REPEAT);
 }
 
 void RenderSystem::bind_textures() {
-    //assume program is already bound
+    // assume program is already bound
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, background_.bg_emission);
     glActiveTexture(GL_TEXTURE1);
@@ -166,8 +205,8 @@ void RenderSystem::bind_textures() {
 }
 
 void RenderSystem::unbind_textures() {
-    //assume program is already bound
-    for(int i = 0; i < 9; i++) {
+    // assume program is already bound
+    for (int i = 0; i < 9; i++) {
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
@@ -181,7 +220,8 @@ RenderSystem::CyberpunkBackground::~CyberpunkBackground() {
     glDeleteBuffers(1, &vbo);
 }
 
-void RenderSystem::render_background(glm::uvec2 drawable_size, glm::vec2 camera_pos) {
+void RenderSystem::render_background(glm::uvec2 drawable_size,
+                                     glm::vec2 camera_pos) {
     // Bind VAO
     glBindVertexArray(background_.vao);
 
@@ -195,18 +235,18 @@ void RenderSystem::render_background(glm::uvec2 drawable_size, glm::vec2 camera_
     auto time_diff =
         duration_cast<milliseconds>(high_resolution_clock::now() - start_time);
     float time = time_diff.count();
-    glUniform1f(background_.shader.m.u_time_loc, time/1000.0);
+    glUniform1f(background_.shader.m.u_time_loc, time / 1000.0);
 
     glUniform2f(background_.shader.m.u_drawable_size_loc,
                 (float)drawable_size.x, (float)drawable_size.y);
-    glUniform2f(background_.shader.m.u_camera_pos,
-                (float)camera_pos.x, (float)camera_pos.y);
+    glUniform2f(background_.shader.m.u_camera_pos, (float)camera_pos.x,
+                (float)camera_pos.y);
 
     bind_textures();
 
     // Draw
     glDrawArrays(GL_TRIANGLE_STRIP, 0, background_.vertices.size());
-    glUseProgram(0); //unbind
+    glUseProgram(0);  // unbind
 }
 
 /**

@@ -4,22 +4,21 @@
 
 enum class SpawnerType { Horizontal, Vertical, Chasing, Spray };
 
-
 struct ProjectileSpawnerComponent {
     SpawnerType type;
 
-    glm::vec2 position_range;  // For horizontal/vertical (min, max)
-    float trigger_height = 0;  // For height-based spawners
-    float interval = 0;        // Time between bursts
-    float small_interval = 0;  // Time between individual shots in a burst
-    int burst_count = 1;       // Number of shots per burst
-    int projectile_count = 6;  // Spray: Number of projectiles in spray
-    float projectile_speed = 0; // Speed of spawned projectiles
-    float projectile_lifetime = 0; // Lifetime of spawned projectiles
+    glm::vec2 position_range;       // For horizontal/vertical (min, max)
+    float trigger_height = 0;       // For height-based spawners
+    float interval = 0;             // Time between bursts
+    float small_interval = 0;       // Time between individual shots in a burst
+    int burst_count = 1;            // Number of shots per burst
+    int projectile_count = 6;       // Spray: Number of projectiles in spray
+    float projectile_speed = 0;     // Speed of spawned projectiles
+    float projectile_lifetime = 0;  // Lifetime of spawned projectiles
 
     // Internal timers
-    float timer = 0;           // General-purpose timer for interval
-    int shots_remaining = 0;   // Remaining shots in the current burst
+    float timer = 0;          // General-purpose timer for interval
+    int shots_remaining = 0;  // Remaining shots in the current burst
 
     explicit ProjectileSpawnerComponent(
         SpawnerType type_, glm::vec2 position_range_, float interval_,

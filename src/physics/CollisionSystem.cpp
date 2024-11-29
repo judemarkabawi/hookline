@@ -1,10 +1,10 @@
 #include "CollisionSystem.hpp"
 
 #include "core/TransformComponent.hpp"
-#include "physics/ColliderComponent.hpp"
-#include "physics/RigidBodyComponent.hpp"
-#include "physics/GrapplingHook.hpp"
 #include "gameplay/HealthComponent.hpp"
+#include "physics/ColliderComponent.hpp"
+#include "physics/GrapplingHook.hpp"
+#include "physics/RigidBodyComponent.hpp"
 
 namespace {
 bool check_collision_aabb(const TransformComponent &transform1,
@@ -59,7 +59,8 @@ void CollisionSystem::update(float dt, entt::registry &registry) {
  */
 void CollisionSystem::handle_collision(entt::entity entity1,
                                        entt::entity entity2,
-                                       entt::registry &registry, std::vector<entt::entity> &to_destroy) {
+                                       entt::registry &registry,
+                                       std::vector<entt::entity> &to_destroy) {
     auto [collider1, transform1, rigid_body1] =
         registry.get<ColliderComponent, TransformComponent, RigidBodyComponent>(
             entity1);
@@ -133,11 +134,12 @@ void CollisionSystem::handle_collision(entt::entity entity1,
         rigid_body2.velocity = -bounce * velocity2_normal + velocity2_tangent;
     }
 
-    if(collider1.is_breakable){
+    if (collider1.is_breakable) {
         to_destroy.push_back(entity1);
         // Detach grappling hook if attached
-        for (auto [_, grapple] : registry.view<GrapplingHookComponent>().each()) {
-            if(grapple.attached) {
+        for (auto [_, grapple] :
+             registry.view<GrapplingHookComponent>().each()) {
+            if (grapple.attached) {
                 grapple.detach();
             }
         }
@@ -146,8 +148,9 @@ void CollisionSystem::handle_collision(entt::entity entity1,
     if (collider2.is_breakable) {
         to_destroy.push_back(entity2);
         // Detach grappling hook if attached
-        for (auto [_, grapple] : registry.view<GrapplingHookComponent>().each()) {
-            if(grapple.attached) {
+        for (auto [_, grapple] :
+             registry.view<GrapplingHookComponent>().each()) {
+            if (grapple.attached) {
                 grapple.detach();
             }
         }
@@ -161,5 +164,4 @@ void CollisionSystem::handle_collision(entt::entity entity1,
         auto &health = registry.get<HealthComponent>(entity1);
         health.take_damage(1);
     }
-
 }

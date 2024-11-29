@@ -4,15 +4,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/random.hpp>
 
-#include "HealthComponent.hpp"
 #include "CollectableComponent.hpp"
-#include "physics/RigidBodyComponent.hpp"
-#include "physics/ColliderComponent.hpp"
-#include "physics/GrapplingHook.hpp"
+#include "HealthComponent.hpp"
+#include "constants.hpp"
 #include "core/TransformComponent.hpp"
+#include "physics/GrapplingHook.hpp"
+#include "physics/RigidBodyComponent.hpp"
 #include "render/RenderComponent.hpp"
 #include "util/misc.hpp"
-#include "constants.hpp"
 
 CollectableSystem::CollectableSystem(AssetManager *asset_manager)
     : asset_manager_(asset_manager) {}
@@ -33,13 +32,16 @@ void CollectableSystem::update(float dt, entt::registry &registry,
     }
 }
 
-void CollectableSystem::spawn(entt::registry &registry, glm::vec2 position, CollectableType type) {
+void CollectableSystem::spawn(entt::registry &registry, glm::vec2 position,
+                              CollectableType type) {
     auto collectable = registry.create();
     registry.emplace<TransformComponent>(
         collectable,
         TransformComponent(position, glm::vec2{0.025f, 0.025f}, 0.0f));
-    registry.emplace<CollectableComponent>(collectable, CollectableComponent{type});
-    std::vector<glm::vec2> points = hookline::get_basic_shape_debug(1.0 / hookline::collectible_glow_ratio);
+    registry.emplace<CollectableComponent>(collectable,
+                                           CollectableComponent{type});
+    std::vector<glm::vec2> points =
+        hookline::get_basic_shape_debug(1.0 / hookline::collectible_glow_ratio);
     glm::vec4 color;
     switch (type) {
         case CollectableType::Feather:
@@ -49,14 +51,13 @@ void CollectableSystem::spawn(entt::registry &registry, glm::vec2 position, Coll
             color = {0.2f, 0.8f, 0.2f, 1.0f};  // Green for Potion
             break;
         default:
-            color = {0.96, 0.48, 0.16, 1.0};  
+            color = {0.96, 0.48, 0.16, 1.0};
             break;
     }
     registry.emplace<RenderComponent>(
-        collectable,
-        RenderComponent::from_vertices_color_tex(points, color, 
-               hookline::get_basic_uvs_debug(), RenderComponent::RenderType::COLLECTIBLE));
-
+        collectable, RenderComponent::from_vertices_color_tex(
+                         points, color, hookline::get_basic_uvs_debug(),
+                         RenderComponent::RenderType::COLLECTIBLE));
 }
 
 void CollectableSystem::spawn_random(entt::registry &registry) {
@@ -66,29 +67,33 @@ void CollectableSystem::spawn_random(entt::registry &registry) {
 }
 
 void CollectableSystem::on_pickup(entt::registry &registry,
-                                  entt::entity collectable, entt::entity player_entity) {
-
-    auto &collectable_component = registry.get<CollectableComponent>(collectable);
+                                  entt::entity collectable,
+                                  entt::entity player_entity) {
+    auto &collectable_component =
+        registry.get<CollectableComponent>(collectable);
 
     switch (collectable_component.type) {
         case CollectableType::Feather: {
-
             // Get velocity and boost direction
-            auto &player_rigidbody = registry.get<RigidBodyComponent>(player_entity);
-            glm::vec2 boost_direction = glm::normalize(player_rigidbody.velocity);
+            auto &player_rigidbody =
+                registry.get<RigidBodyComponent>(player_entity);
+            glm::vec2 boost_direction =
+                glm::normalize(player_rigidbody.velocity);
 
             // Detach grappling hook if attached
-            for (auto [_, grapple] : registry.view<GrapplingHookComponent>().each()) {
-                if(grapple.attached) {
+            for (auto [_, grapple] :
+                 registry.view<GrapplingHookComponent>().each()) {
+                if (grapple.attached) {
                     grapple.detach();
                 }
             }
 
             if (glm::length(boost_direction) == 0.0f) {
-                boost_direction = glm::vec2(0.0f, 1.0f);  // Default upward boost
+                boost_direction =
+                    glm::vec2(0.0f, 1.0f);  // Default upward boost
             }
 
-            float boost_multiplier = 3.0f;  
+            float boost_multiplier = 3.0f;
             player_rigidbody.velocity += boost_direction * boost_multiplier;
 
             break;
@@ -105,6 +110,6 @@ void CollectableSystem::on_pickup(entt::registry &registry,
     }
 
     registry.destroy(collectable);
-    //TODO: refactor different play sounds for different pickups 
+    // TODO: refactor different play sounds for different pickups
     Sound::play(asset_manager_->get_sound("item_pick_up"), 0.5f);
 }
