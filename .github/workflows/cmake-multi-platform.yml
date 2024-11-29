@@ -75,8 +75,7 @@ jobs:
           libglu1-mesa-dev \
           libglu1-mesa \
           libasound2-dev \
-          libpulse-dev \
-          libpipewire-0.3-dev
+          libpulse-dev
 
     - name: Vcpkg - Setup
       shell: bash
