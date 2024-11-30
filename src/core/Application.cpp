@@ -34,7 +34,7 @@ bool Application::init() {
     window_ = SDL_CreateWindow(
         "Hookline", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
         hookline::default_window_width, hookline::default_window_height,
-        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     SDL_SetWindowMinimumSize(window_, hookline::minimum_window_width,
                              hookline::minimum_window_height);
 
