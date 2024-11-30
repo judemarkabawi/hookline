@@ -74,4 +74,27 @@ std::string data_path(std::string const &suffix) {
     static std::string path = get_exe_path();  // cache result of get_exe_path()
     return path + "/" + suffix;
 }
+
+glm::vec2 screen_to_opengl(glm::vec2 position, glm::uvec2 drawable_size) {
+    glm::vec2 result;
+    result.x = (2.0f * position.x) / drawable_size.x - 1.0f;
+    result.y = 1.0f - (2.0f * position.y) / drawable_size.y;
+    return result;
+}
+
+glm::vec2 opengl_to_screen(glm::vec2 position, glm::uvec2 drawable_size) {
+    glm::vec2 result;
+    result.x = ((position.x + 1.0f) / 2.0f) * drawable_size.x;
+    result.y = ((1.0f - position.y) / 2.0f) * drawable_size.y;
+    return result;
+}
+
+glm::vec2 convert_opengl_mouse_to_world(glm::vec2 opengl_position,
+                                        glm::vec2 camera_position,
+                                        glm::vec2 camera_viewport_size,
+                                        float pixels_per_unit) {
+    return opengl_position * (camera_viewport_size / 2.0f) / pixels_per_unit +
+           camera_position;
+}
+
 }  // namespace hookline

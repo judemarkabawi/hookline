@@ -92,23 +92,4 @@ std::optional<glm::vec2> raycast(glm::vec2 start, glm::vec2 direction,
     return closest_hit;
 }
 
-/**
- * Convert a mouse position from SDL_GetMouseState to OpenGL coordinates
- * TODO: Should probably move this
- */
-glm::vec2 convert_mouse_to_opengl(int x, int y, glm::uvec2 drawable_size) {
-    glm::vec2 result;
-    result.x = (2.0f * x) / drawable_size.x - 1.0f;
-    result.y = 1.0f - (2.0f * y) / drawable_size.y;
-    return result;
-}
-
-glm::vec2 convert_opengl_mouse_to_world(glm::vec2 opengl_position,
-                                        glm::vec2 camera_position,
-                                        glm::vec2 camera_viewport_size,
-                                        float pixels_per_unit) {
-    return opengl_position * (camera_viewport_size / 2.0f) / pixels_per_unit +
-           camera_position;
-}
-
 }  // namespace hookline

@@ -175,7 +175,7 @@ bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
             SDL_GetMouseState(&x, &y);
             player_.mouse.pressed = true;
             player_.mouse.position =
-                hookline::convert_mouse_to_opengl(x, y, drawable_size);
+                hookline::screen_to_opengl({x, y}, drawable_size);
         }
     } else if (event.type == SDL_MOUSEBUTTONUP) {
         if (event.button.button == SDL_BUTTON_LEFT) {
