@@ -3,7 +3,9 @@
 #include <SDL2/SDL.h>
 
 #include <glm/glm.hpp>
+#include <memory>
 
+#include "core/game/GameMode.hpp"
 #include "core/game/PlayMode.hpp"
 #include "core/game/StartMenuMode.hpp"
 
@@ -15,9 +17,9 @@ class Game {
     void render(glm::uvec2 drawable_size);
     bool handle_event(SDL_Event const &event, glm::uvec2 drawable_size);
 
-   private:
     void change_mode(GameMode::Mode mode);
 
+   private:
     GameMode *current_mode_;
     std::unique_ptr<StartMenuMode> start_menu_;
     std::unique_ptr<PlayMode> play_game_;

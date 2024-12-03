@@ -1,10 +1,10 @@
 #include "StartMenuMode.hpp"
 
+#include "core/Game.hpp"
+#include "core/game/GameMode.hpp"
 #include "core/text/TextComponent.hpp"
 
-StartMenuMode::StartMenuMode(
-    std::function<void(GameMode::Mode)> change_mode_callback)
-    : change_mode_callback_(change_mode_callback) {
+StartMenuMode::StartMenuMode() {
     entt::entity title = registry_.create();
     registry_.emplace<TextComponent>(
         title, TextComponent::from_text("Hookline", {-0.35, 0.5}, 5.0f));
@@ -15,12 +15,12 @@ StartMenuMode::StartMenuMode(
         TextComponent::from_text("Click anywhere to play", {-0.2, -0.1}, 1.0f));
 }
 
-void StartMenuMode::update(float dt) {
+void StartMenuMode::update(float dt, Game& _) {
     (void)dt;
     return;
 }
 
-void StartMenuMode::render(glm::uvec2 drawable_size) {
+void StartMenuMode::render(glm::uvec2 drawable_size, Game& _) {
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -29,13 +29,13 @@ void StartMenuMode::render(glm::uvec2 drawable_size) {
     rendering_.render_text(drawable_size, registry_);
 }
 
-bool StartMenuMode::handle_event(SDL_Event const &event,
-                                 glm::uvec2 drawable_size) {
+bool StartMenuMode::handle_event(SDL_Event const& event,
+                                 glm::uvec2 drawable_size, Game& game) {
     (void)drawable_size;
 
     if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button.button == SDL_BUTTON_LEFT) {
-            change_mode_callback_(GameMode::Mode::PlayMode);
+            game.change_mode(GameMode::Mode::PlayMode);
             return true;
         }
     }

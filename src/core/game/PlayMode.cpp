@@ -22,10 +22,8 @@
 #include "render/RenderComponent.hpp"
 #include "util/misc.hpp"
 
-PlayMode::PlayMode(std::function<void(GameMode::Mode)> change_mode_callback)
-    : collectables(&asset_manager),
-      projectileSystem(&asset_manager),
-      change_mode_callback_(change_mode_callback) {
+PlayMode::PlayMode()
+    : collectables(&asset_manager), projectileSystem(&asset_manager) {
     // Need to load level before camera
     setup_map();
 
@@ -35,7 +33,7 @@ PlayMode::PlayMode(std::function<void(GameMode::Mode)> change_mode_callback)
     Sound::loop(asset_manager.get_sound("guitar_loop_music"), 0.25);
 }
 
-void PlayMode::update(float dt) {
+void PlayMode::update(float dt, Game &_) {
     /* -- PLAYER INPUT & GRAPPLE -- */
     // TODO: Put input into a separate input component and handle this movement
     auto &inputs = registry.get<InputComponent>(player_.entity);
@@ -107,12 +105,13 @@ void PlayMode::update(float dt) {
     collisions.update(dt, registry);
 }
 
-void PlayMode::render(glm::uvec2 drawable_size) {
+void PlayMode::render(glm::uvec2 drawable_size, Game &_) {
     // Render scene
     rendering.render(drawable_size, registry, camera_entity);
 }
 
-bool PlayMode::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
+bool PlayMode::handle_event(SDL_Event const &event, glm::uvec2 drawable_size,
+                            Game &_) {
     if (event.type == SDL_KEYDOWN) {
         if (event.key.keysym.sym == SDLK_a) {
             player_.left.pressed = true;

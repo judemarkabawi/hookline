@@ -25,12 +25,12 @@
  */
 class PlayMode : public GameMode {
    public:
-    PlayMode(std::function<void(GameMode::Mode)> change_mode_callback_);
+    PlayMode();
 
-    void update(float dt) override;
-    void render(glm::uvec2 drawable_size) override;
-    bool handle_event(SDL_Event const &event,
-                      glm::uvec2 drawable_size) override;
+    void update(float dt, Game& game) override;
+    void render(glm::uvec2 drawable_size, Game& game) override;
+    bool handle_event(SDL_Event const& event, glm::uvec2 drawable_size,
+                      Game& game) override;
 
     struct Player {
         entt::entity entity;
@@ -59,6 +59,4 @@ class PlayMode : public GameMode {
    private:
     void setup_camera();
     void setup_map();
-
-    std::function<void(GameMode::Mode)> change_mode_callback_;
 };

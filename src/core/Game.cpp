@@ -7,22 +7,20 @@
 #include "core/game/StartMenuMode.hpp"
 
 Game::Game() {
-    start_menu_ = std::make_unique<StartMenuMode>(
-        [this](GameMode::Mode mode) { change_mode(mode); });
-    play_game_ = std::make_unique<PlayMode>(
-        [this](GameMode::Mode mode) { change_mode(mode); });
+    start_menu_ = std::make_unique<StartMenuMode>();
+    play_game_ = std::make_unique<PlayMode>();
 
     current_mode_ = static_cast<GameMode *>(start_menu_.get());
 }
 
-void Game::update(float dt) { current_mode_->update(dt); }
+void Game::update(float dt) { current_mode_->update(dt, *this); }
 
 void Game::render(glm::uvec2 drawable_size) {
-    current_mode_->render(drawable_size);
+    current_mode_->render(drawable_size, *this);
 }
 
 bool Game::handle_event(SDL_Event const &event, glm::uvec2 drawable_size) {
-    return current_mode_->handle_event(event, drawable_size);
+    return current_mode_->handle_event(event, drawable_size, *this);
 }
 
 void Game::change_mode(GameMode::Mode mode) {
