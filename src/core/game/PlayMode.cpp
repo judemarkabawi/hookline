@@ -8,6 +8,7 @@
 #include <glm/gtc/random.hpp>
 
 #include "constants.hpp"
+#include "core/Game.hpp"
 #include "core/InputComponent.hpp"
 #include "core/Level.hpp"
 #include "core/TransformComponent.hpp"
@@ -111,7 +112,7 @@ void PlayMode::render(glm::uvec2 drawable_size, Game &_) {
 }
 
 bool PlayMode::handle_event(SDL_Event const &event, glm::uvec2 drawable_size,
-                            Game &_) {
+                            Game &game) {
     if (event.type == SDL_KEYDOWN) {
         if (event.key.keysym.sym == SDLK_a) {
             player_.left.pressed = true;
@@ -129,6 +130,7 @@ bool PlayMode::handle_event(SDL_Event const &event, glm::uvec2 drawable_size,
             auto &grapple =
                 registry.get<GrapplingHookComponent>(grapple_entity);
             grapple.hold(registry);
+            return true;
         }
     } else if (event.type == SDL_KEYUP) {
         if (event.key.keysym.sym == SDLK_a) {
@@ -147,6 +149,10 @@ bool PlayMode::handle_event(SDL_Event const &event, glm::uvec2 drawable_size,
             auto &grapple =
                 registry.get<GrapplingHookComponent>(grapple_entity);
             grapple.unhold();
+            return true;
+        } else if (event.key.keysym.sym == SDLK_ESCAPE) {
+            game.change_mode(GameMode::Mode::PauseMenuMode);
+            return true;
         }
     } else if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (event.button.button == SDL_BUTTON_LEFT) {

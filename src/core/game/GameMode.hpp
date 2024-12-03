@@ -10,6 +10,7 @@ class GameMode {
    public:
     enum class Mode {
         StartMenuMode,
+        PauseMenuMode,
         PlayMode,
     };
 

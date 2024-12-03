@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "core/game/GameMode.hpp"
+#include "core/game/PauseMenuMode.hpp"
 #include "core/game/PlayMode.hpp"
 #include "core/game/StartMenuMode.hpp"
 
@@ -22,5 +23,6 @@ class Game {
    private:
     GameMode *current_mode_;
     std::unique_ptr<StartMenuMode> start_menu_;
+    std::unique_ptr<PauseMenuMode> pause_menu_;
     std::unique_ptr<PlayMode> play_game_;
 };
