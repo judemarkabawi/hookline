@@ -18,7 +18,7 @@
 #define FONT_SIZE 36
 #define MARGIN (FONT_SIZE * .5)
 
-GlyphData::~GlyphData() { hb_buffer_destroy(this->hb_buffer); }
+GlyphData::~GlyphData() { }
 
 void printBitmap(const FT_Bitmap& bitmap) {
     std::cout << "Glyph Bitmap (" << bitmap.width << "x" << bitmap.rows
