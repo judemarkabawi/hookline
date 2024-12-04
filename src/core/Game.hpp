@@ -10,6 +10,7 @@
 #include "core/game/PlayMode.hpp"
 #include "core/game/StartMenuMode.hpp"
 #include "core/game/GameOverMenuMode.hpp"
+#include "core/game/WinMenuMode.hpp"
 
 class Game {
    public:
@@ -27,4 +28,5 @@ class Game {
     std::unique_ptr<PauseMenuMode> pause_menu_;
     std::unique_ptr<PlayMode> play_game_;
     std::unique_ptr<GameOverMenuMode> game_over_menu_;
+    std::unique_ptr<WinMenuMode> win_menu_;
 };

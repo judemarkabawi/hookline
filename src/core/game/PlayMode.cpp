@@ -98,6 +98,10 @@ void PlayMode::update(float dt, Game &_) {
         }
         _.change_mode(GameMode::Mode::GameOverMenuMode);
     }
+    
+    if(player_transform.position[1] < -5.f){
+        _.change_mode(GameMode::Mode::WinMenuMode);
+    }
 
     // System updates
     physics.update(dt, registry);

@@ -12,7 +12,8 @@ class GameMode {
         StartMenuMode,
         PauseMenuMode,
         PlayMode,
-        GameOverMenuMode
+        GameOverMenuMode,
+        WinMenuMode
     };
 
     virtual ~GameMode() = default;
