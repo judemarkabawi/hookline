@@ -3,6 +3,7 @@
 
 #include "CollectableComponent.hpp"
 #include "core/AssetManager.hpp"
+#include "RespawnerQueue.hpp"
 
 class CollectableSystem {
    public:
@@ -20,4 +21,5 @@ class CollectableSystem {
 
    private:
     AssetManager *asset_manager_;
+    RespawnerQueue respawner_queue_;
 };

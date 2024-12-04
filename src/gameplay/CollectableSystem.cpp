@@ -30,6 +30,12 @@ void CollectableSystem::update(float dt, entt::registry &registry,
     for (auto entity : to_pickup) {
         on_pickup(registry, entity, player);
     }
+
+    // Process respawns
+    auto ready_respawns = respawner_queue_.process_ready();
+    for (const auto &[_, position, type] : ready_respawns) {
+        spawn(registry, position, type);
+    }
 }
 
 void CollectableSystem::spawn(entt::registry &registry, glm::vec2 position,
@@ -45,7 +51,7 @@ void CollectableSystem::spawn(entt::registry &registry, glm::vec2 position,
     glm::vec4 color;
     switch (type) {
         case CollectableType::Feather:
-            color = {0.96, 0.48, 0.16, 1.0};  // Orange for Feather
+            color = {0.768, 0.384, 0.128, 1.0};  // Orange for Feather
             break;
         case CollectableType::Potion:
             color = {0.2f, 0.8f, 0.2f, 1.0f};  // Green for Potion
@@ -69,8 +75,11 @@ void CollectableSystem::spawn_random(entt::registry &registry) {
 void CollectableSystem::on_pickup(entt::registry &registry,
                                   entt::entity collectable,
                                   entt::entity player_entity) {
+
+    auto &transform = registry.get<TransformComponent>(collectable);
     auto &collectable_component =
         registry.get<CollectableComponent>(collectable);
+
 
     switch (collectable_component.type) {
         case CollectableType::Feather: {
@@ -95,6 +104,8 @@ void CollectableSystem::on_pickup(entt::registry &registry,
 
             float boost_multiplier = 3.0f;
             player_rigidbody.velocity += boost_direction * boost_multiplier;
+
+            respawner_queue_.add_respawn(transform.position, collectable_component.type, 3.0f);
 
             break;
         }
