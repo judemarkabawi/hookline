@@ -6,11 +6,13 @@
 #include "core/game/PauseMenuMode.hpp"
 #include "core/game/PlayMode.hpp"
 #include "core/game/StartMenuMode.hpp"
+#include "core/game/GameOverMenuMode.hpp"
 
 Game::Game() {
     start_menu_ = std::make_unique<StartMenuMode>();
     pause_menu_ = std::make_unique<PauseMenuMode>();
     play_game_ = std::make_unique<PlayMode>();
+    game_over_menu_ = std::make_unique<GameOverMenuMode>();
 
     current_mode_ = static_cast<GameMode *>(start_menu_.get());
 }
@@ -30,6 +32,8 @@ void Game::change_mode(GameMode::Mode mode) {
         current_mode_ = start_menu_.get();
     } else if (mode == GameMode::Mode::PauseMenuMode) {
         current_mode_ = pause_menu_.get();
+    } else if (mode == GameMode::Mode::GameOverMenuMode) {
+        current_mode_ = game_over_menu_.get();
     } else {
         current_mode_ = play_game_.get();
     }

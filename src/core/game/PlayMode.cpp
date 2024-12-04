@@ -96,6 +96,7 @@ void PlayMode::update(float dt, Game &_) {
         if (registry.all_of<ColliderComponent>(player_.entity)) {
             registry.remove<ColliderComponent>(player_.entity);
         }
+        _.change_mode(GameMode::Mode::GameOverMenuMode);
     }
 
     // System updates
