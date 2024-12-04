@@ -35,13 +35,13 @@ class CyberpunkBackgroundShaderFull {
         // texture locations
         GLuint u_bg_emission = -1U;
         GLuint u_bg_color = -1U;
-        GLuint u_bg_normal = -1U;
+        GLuint u_bg_normals = -1U;
         GLuint u_mg_emission = -1U;
         GLuint u_mg_color = -1U;
-        GLuint u_mg_normal = -1U;
+        GLuint u_mg_normals = -1U;
         GLuint u_fg_emission = -1U;
         GLuint u_fg_color = -1U;
-        GLuint u_fg_normal = -1U;
+        GLuint u_fg_normals = -1U;
         GLuint u_bg_cube = -1U;
     } m;
 };

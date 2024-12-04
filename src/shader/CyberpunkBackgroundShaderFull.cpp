@@ -18,15 +18,15 @@ CyberpunkBackgroundShaderFull::CyberpunkBackgroundShaderFull() {
     // texture uniforms
     m.u_bg_emission = glGetUniformLocation(m.program, "u_bg_emission");
     m.u_bg_color = glGetUniformLocation(m.program, "u_bg_color");
-    m.u_bg_normal = glGetUniformLocation(m.program, "u_bg_normal");
+    m.u_bg_normals = glGetUniformLocation(m.program, "u_bg_normal");
 
     m.u_mg_emission = glGetUniformLocation(m.program, "u_mg_emission");
     m.u_mg_color = glGetUniformLocation(m.program, "u_mg_color");
-    m.u_mg_normal = glGetUniformLocation(m.program, "u_mg_normal");
+    m.u_mg_normals = glGetUniformLocation(m.program, "u_mg_normal");
 
     m.u_fg_emission = glGetUniformLocation(m.program, "u_fg_emission");
     m.u_fg_color = glGetUniformLocation(m.program, "u_fg_color");
-    m.u_fg_normal = glGetUniformLocation(m.program, "u_fg_normal");
+    m.u_fg_normals = glGetUniformLocation(m.program, "u_fg_normal");
 
     m.u_bg_cube = glGetUniformLocation(m.program, "u_bg_cube");
 
@@ -36,13 +36,13 @@ CyberpunkBackgroundShaderFull::CyberpunkBackgroundShaderFull() {
 
     glUniform1i(m.u_bg_emission, 0);
     glUniform1i(m.u_bg_color, 1);
-    glUniform1i(m.u_bg_normal, 2);
+    glUniform1i(m.u_bg_normals, 2);
     glUniform1i(m.u_mg_emission, 3);
     glUniform1i(m.u_mg_color, 4);
-    glUniform1i(m.u_mg_normal, 5);
+    glUniform1i(m.u_mg_normals, 5);
     glUniform1i(m.u_fg_emission, 6);
     glUniform1i(m.u_fg_color, 7);
-    glUniform1i(m.u_fg_normal, 8);
+    glUniform1i(m.u_fg_normals, 8);
     glUniform1i(m.u_bg_cube, 9);
 
     glUseProgram(0);  // unbind program -- glUniform* calls refer to ??? now

@@ -7,6 +7,7 @@
 
 #include "core/AssetManager.hpp"
 #include "core/text/TextRenderer.hpp"
+#include "render/Mesh2D.hpp"
 #include "shader/BasicMeshShader.hpp"
 #include "shader/CollectibleShader.hpp"
 #include "shader/CyberpunkBackgroundShader.hpp"
@@ -14,6 +15,7 @@
 #include "shader/GrappleBoxShader.hpp"
 #include "shader/PlayerShader.hpp"
 #include "shader/ProjectileShader.hpp"
+#include "util/misc.hpp"
 
 /**
    The RenderSystem is very inefficient right now. It rebinds VAOs and VBOs for
@@ -38,52 +40,14 @@ class RenderSystem {
     void render_background(glm::uvec2 drawable_size, glm::vec2 camera_pos);
 
    private:
-    struct CyberpunkBackground {
-        CyberpunkBackgroundShaderFull shader;
-        std::vector<glm::vec2> vertices;
-        GLuint vao;
-        GLuint vbo;
-
-        // textures
-        GLuint bg_emission = -1U;
-        GLuint bg_color = -1U;
-        GLuint bg_normals = -1U;
-        GLuint mg_emission = -1U;
-        GLuint mg_color = -1U;
-        GLuint mg_normals = -1U;
-        GLuint fg_emission = -1U;
-        GLuint fg_color = -1U;
-        GLuint fg_normals = -1U;
-        GLuint bg_cube = -1U;
-
-        CyberpunkBackground();
-        ~CyberpunkBackground();
-
-        CyberpunkBackground(const CyberpunkBackground &other) = delete;
-        CyberpunkBackground &operator=(const CyberpunkBackground &other) =
-            delete;
-
-        CyberpunkBackground(CyberpunkBackground &&other) = delete;
-        CyberpunkBackground &operator=(CyberpunkBackground &&other) = delete;
-    };
-
     void bind_textures();
     void unbind_textures();
 
-    struct MenuBackground {
-        CyberpunkBackgroundShader shader;
-        std::vector<glm::vec2> vertices;
-        GLuint vao;
-        GLuint vbo;
-
-        MenuBackground();
-        ~MenuBackground();
-
-        MenuBackground(const MenuBackground &other) = delete;
-        MenuBackground &operator=(const MenuBackground &other) = delete;
-
-        MenuBackground(MenuBackground &&other) = delete;
-        MenuBackground &operator=(MenuBackground &&other) = delete;
+    template <typename Shader>
+    struct Background {
+        Mesh2D mesh = Mesh2D::from_verts_color(
+            hookline::get_basic_shape_debug(), {0, 0, 0, 0});
+        Shader shader;
     };
 
     TextRenderer text_renderer;
@@ -93,6 +57,7 @@ class RenderSystem {
     CollectibleShader collectible_shader;
     ProjectileShader projectile_shader;
     PlayerShader player_shader;
-    CyberpunkBackground background_;
-    MenuBackground menu_background_;
+
+    Background<CyberpunkBackgroundShaderFull> background_;
+    Background<CyberpunkBackgroundShader> menu_background_;
 };

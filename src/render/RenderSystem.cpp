@@ -111,68 +111,45 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
     render_text(drawable_size, registry);
 }
 
-RenderSystem::CyberpunkBackground::CyberpunkBackground() {
-    vertices = hookline::get_basic_shape_debug();
-
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-
-    // Bind VAO
-    glBindVertexArray(vao);
-
-    // Vertex data
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec2),
-                 vertices.data(), GL_STATIC_DRAW);
-
-    // Vertex attribute data
-    glVertexAttribPointer(shader.m.a_position_loc, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(glm::vec2), (void *)0);
-    glEnableVertexAttribArray(shader.m.a_position_loc);
-
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
 void RenderSystem::load_background_images(AssetManager *manager) {
     // load associated textures
-    background_.bg_emission = manager->load_texture(
+    background_.shader.m.u_bg_emission = manager->load_texture(
         "bg_emission",
         hookline::data_path("../../assets/textures/bg_emission.png"),
         GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
-    background_.bg_color = manager->load_texture(
+    background_.shader.m.u_bg_color = manager->load_texture(
         "bg_color", hookline::data_path("../../assets/textures/bg_color.png"),
         GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
-    background_.bg_normals = manager->load_texture(
+    background_.shader.m.u_bg_normals = manager->load_texture(
         "bg_normals",
         hookline::data_path("../../assets/textures/bg_normals.png"),
         GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
 
-    background_.mg_emission = manager->load_texture(
+    background_.shader.m.u_mg_emission = manager->load_texture(
         "bg_emission",
         hookline::data_path("../../assets/textures/bg_emission.png"),
         GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
-    background_.mg_color = manager->load_texture(
+    background_.shader.m.u_mg_color = manager->load_texture(
         "bg_color", hookline::data_path("../../assets/textures/bg_color.png"),
         GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
-    background_.mg_normals = manager->load_texture(
+    background_.shader.m.u_mg_normals = manager->load_texture(
         "bg_normals",
         hookline::data_path("../../assets/textures/bg_normals.png"),
         GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
 
-    background_.fg_emission = manager->load_texture(
+    background_.shader.m.u_fg_emission = manager->load_texture(
         "fg_emission",
         hookline::data_path("../../assets/textures/fg_emission.png"),
         GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
-    background_.fg_color = manager->load_texture(
+    background_.shader.m.u_fg_color = manager->load_texture(
         "fg_color", hookline::data_path("../../assets/textures/fg_color.png"),
         GL_TEXTURE_2D, GL_LINEAR, GL_REPEAT);
-    background_.fg_normals = manager->load_texture(
+    background_.shader.m.u_fg_normals = manager->load_texture(
         "fg_normals",
         hookline::data_path("../../assets/textures/fg_normals.png"),
         GL_TEXTURE_2D, GL_NEAREST, GL_CLAMP);
 
-    background_.bg_cube = manager->load_texture(
+    background_.shader.m.u_bg_cube = manager->load_texture(
         "bg_cube_", hookline::data_path("../../assets/textures/bg_cube_"),
         GL_TEXTURE_CUBE_MAP, GL_LINEAR, GL_REPEAT);
 }
@@ -180,28 +157,28 @@ void RenderSystem::load_background_images(AssetManager *manager) {
 void RenderSystem::bind_textures() {
     // assume program is already bound
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, background_.bg_emission);
+    glBindTexture(GL_TEXTURE_2D, background_.shader.m.u_bg_emission);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, background_.bg_color);
+    glBindTexture(GL_TEXTURE_2D, background_.shader.m.u_bg_color);
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, background_.bg_normals);
+    glBindTexture(GL_TEXTURE_2D, background_.shader.m.u_bg_normals);
 
     glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, background_.mg_emission);
+    glBindTexture(GL_TEXTURE_2D, background_.shader.m.u_mg_emission);
     glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, background_.mg_color);
+    glBindTexture(GL_TEXTURE_2D, background_.shader.m.u_mg_color);
     glActiveTexture(GL_TEXTURE5);
-    glBindTexture(GL_TEXTURE_2D, background_.mg_normals);
+    glBindTexture(GL_TEXTURE_2D, background_.shader.m.u_mg_normals);
 
     glActiveTexture(GL_TEXTURE6);
-    glBindTexture(GL_TEXTURE_2D, background_.fg_emission);
+    glBindTexture(GL_TEXTURE_2D, background_.shader.m.u_fg_emission);
     glActiveTexture(GL_TEXTURE7);
-    glBindTexture(GL_TEXTURE_2D, background_.fg_color);
+    glBindTexture(GL_TEXTURE_2D, background_.shader.m.u_fg_color);
     glActiveTexture(GL_TEXTURE8);
-    glBindTexture(GL_TEXTURE_2D, background_.fg_normals);
+    glBindTexture(GL_TEXTURE_2D, background_.shader.m.u_fg_normals);
 
     glActiveTexture(GL_TEXTURE9);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, background_.bg_cube);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, background_.shader.m.u_bg_cube);
 }
 
 void RenderSystem::unbind_textures() {
@@ -215,15 +192,10 @@ void RenderSystem::unbind_textures() {
     glActiveTexture(GL_TEXTURE0);
 }
 
-RenderSystem::CyberpunkBackground::~CyberpunkBackground() {
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
-}
-
 void RenderSystem::render_background(glm::uvec2 drawable_size,
                                      glm::vec2 camera_pos) {
     // Bind VAO
-    glBindVertexArray(background_.vao);
+    glBindVertexArray(background_.mesh.vao);
 
     // Use program
     glUseProgram(background_.shader.m.program);
@@ -245,7 +217,7 @@ void RenderSystem::render_background(glm::uvec2 drawable_size,
     bind_textures();
 
     // Draw
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, background_.vertices.size());
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, background_.mesh.verts.size());
     glUseProgram(0);  // unbind
 }
 
@@ -323,37 +295,9 @@ void RenderSystem::render_text(glm::uvec2 drawable_size,
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 }
 
-RenderSystem::MenuBackground::MenuBackground() {
-    vertices = hookline::get_basic_shape_debug();
-
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-
-    // Bind VAO
-    glBindVertexArray(vao);
-
-    // Vertex data
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec2),
-                 vertices.data(), GL_STATIC_DRAW);
-
-    // Vertex attribute data
-    glVertexAttribPointer(shader.m.a_position_loc, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(glm::vec2), (void *)0);
-    glEnableVertexAttribArray(shader.m.a_position_loc);
-
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-RenderSystem::MenuBackground::~MenuBackground() {
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
-}
-
 void RenderSystem::render_menu_background(glm::uvec2 drawable_size) {
     // Bind VAO
-    glBindVertexArray(menu_background_.vao);
+    glBindVertexArray(menu_background_.mesh.vao);
 
     // Use program
     glUseProgram(menu_background_.shader.m.program);
@@ -371,5 +315,5 @@ void RenderSystem::render_menu_background(glm::uvec2 drawable_size) {
                 (float)drawable_size.x, (float)drawable_size.y);
 
     // Draw
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, menu_background_.vertices.size());
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, menu_background_.mesh.verts.size());
 }
