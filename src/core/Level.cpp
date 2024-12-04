@@ -67,12 +67,13 @@ entt::entity create_collectable(entt::registry &registry, glm::vec2 position,
         TransformComponent(position, glm::vec2{0.025f, 0.025f}, 0.0f));
     registry.emplace<CollectableComponent>(collectable,
                                            CollectableComponent{type});
-
+    std::vector<glm::vec2> points =
+        hookline::get_basic_shape_debug(1.0 / hookline::collectible_glow_ratio);
     // Assign color based on collectible type
     glm::vec4 color;
     switch (type) {
         case CollectableType::Feather:
-            color = {0.8f, 0.8f, 0.2f, 1.0f};  // Yellow for Feather
+            color = {0.768, 0.384, 0.128, 1.0};  // Yellow for Feather
             break;
         case CollectableType::Potion:
             color = {0.2f, 0.8f, 0.2f, 1.0f};  // Green for Potion
@@ -83,9 +84,9 @@ entt::entity create_collectable(entt::registry &registry, glm::vec2 position,
     }
 
     registry.emplace<RenderComponent>(
-        collectable, RenderComponent::from_vertices_color(
-                         hookline::get_basic_shape_debug(), color));
-
+        collectable, RenderComponent::from_vertices_color_tex(
+                         points, color, hookline::get_basic_uvs_debug(),
+                         RenderComponent::RenderType::COLLECTIBLE));
     return collectable;
 }
 

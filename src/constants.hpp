@@ -32,7 +32,7 @@ constexpr float grapple_max_length = 4.0f;
 constexpr float grapple_pull_force = 5.0f;
 constexpr float grapple_deactive_distance = 0.01f;
 
-constexpr float collectible_glow_ratio = 1.0 / 20.0f;
+constexpr float collectible_glow_ratio = 1.0 / 5.0f;
 constexpr float projectile_glow_ratio = 1.0 / 2.0f;
 
 }  // namespace hookline
