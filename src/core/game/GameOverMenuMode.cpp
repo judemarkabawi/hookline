@@ -33,7 +33,7 @@ void GameOverMenuMode::render(glm::uvec2 drawable_size, Game& _) {
 }
 
 bool GameOverMenuMode::handle_event(SDL_Event const& event,
-                                 glm::uvec2 drawable_size, Game& game) {
+                                 glm::uvec2 drawable_size, Game& _) {
     (void)drawable_size;
 
     if (event.type == SDL_MOUSEBUTTONDOWN) {
