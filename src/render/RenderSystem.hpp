@@ -36,12 +36,7 @@ class RenderSystem {
 
     void render_menu_background(glm::uvec2 drawable_size);
 
-   private:
     void render_background(glm::uvec2 drawable_size, glm::vec2 camera_pos);
-
-   private:
-    void bind_textures();
-    void unbind_textures();
 
     template <typename Shader>
     struct Background {
@@ -50,14 +45,19 @@ class RenderSystem {
         Shader shader;
     };
 
+   private:
+    void bind_textures();
+    void unbind_textures();
+
     TextRenderer text_renderer;
 
-    BasicMeshShader mesh_shader;
-    GrappleBoxShader grapple_shader;
-    CollectibleShader collectible_shader;
-    ProjectileShader projectile_shader;
-    PlayerShader player_shader;
+    static inline bool loaded = false;
+    static inline std::unique_ptr<BasicMeshShader> mesh_shader = nullptr;
+    static inline std::unique_ptr<GrappleBoxShader> grapple_shader = nullptr;
+    static inline std::unique_ptr<CollectibleShader> collectible_shader = nullptr;
+    static inline std::unique_ptr<ProjectileShader> projectile_shader = nullptr;
+    static inline std::unique_ptr<PlayerShader> player_shader = nullptr;
 
-    Background<CyberpunkBackgroundShaderFull> background_;
-    Background<CyberpunkBackgroundShader> menu_background_;
+    static inline std::unique_ptr<Background<CyberpunkBackgroundShaderFull>> background_ = nullptr;
+    static inline std::unique_ptr<Background<CyberpunkBackgroundShader>> menu_background_ = nullptr;
 };
