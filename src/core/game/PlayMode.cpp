@@ -46,16 +46,42 @@ void PlayMode::update(float dt, Game &game) {
     auto &inputs = registry.get<InputComponent>(player_.entity);
     inputs.movement = {0.0f, 0.0f};
     if (player_.up.pressed) {
-        float force = (grapple.attached ? hookline::player_movement_force.y : 0.0f); 
-        inputs.movement += glm::vec2{0.0f, force};
+        if (grapple.attached) {
+            float force = hookline::player_movement_force.y;
+            glm::vec2 forceVec = force * grapple.get_up_dir(player_transform.position);
+            inputs.movement += forceVec;
+        }
+    }
+    if (player_.down.pressed) {
+        if (grapple.attached) {
+            float force = hookline::player_movement_force.y;
+            glm::vec2 forceVec = force * grapple.get_down_dir(player_transform.position);
+            inputs.movement += forceVec;
+        }
     }
     if (player_.left.pressed) {
-        float force = (grapple.attached ? 2.0f : 1.0f) * -hookline::player_movement_force.x;
-        inputs.movement += glm::vec2{force, 0.0f};
+        if (grapple.attached) {
+            float force = 2.0f * hookline::player_movement_force.x;
+            glm::vec2 forceVec = force * grapple.get_left_dir(player_transform.position);
+            inputs.movement += forceVec;
+        }
+        else {
+            float force = hookline::player_movement_force.x;
+            glm::vec2 forceVec = force * glm::vec2{-1.0f, 0.0f};
+            inputs.movement += forceVec;
+        }
     }
     if (player_.right.pressed) {
-        float force = (grapple.attached ? 2.0f : 1.0f) * hookline::player_movement_force.x;
-        inputs.movement += glm::vec2{force, 0.0f};
+        if (grapple.attached) {
+            float force = 2.0f * hookline::player_movement_force.x;
+            glm::vec2 forceVec = force * grapple.get_right_dir(player_transform.position);
+            inputs.movement += forceVec; 
+        }
+        else { 
+            float force = hookline::player_movement_force.x;
+            glm::vec2 forceVec = force * glm::vec2{1.0f, 0.0f};
+            inputs.movement += forceVec;
+        }
     }
 
     //   Track grapple to player
@@ -137,7 +163,8 @@ bool PlayMode::handle_event(SDL_Event const &event, glm::uvec2 drawable_size,
         } else if (event.key.keysym.sym == SDLK_SPACE) {
             auto &grapple =
                 registry.get<GrapplingHookComponent>(grapple_entity);
-            grapple.hold(registry);
+            if (!grapple.held) grapple.hold(registry);
+            else               grapple.unhold();
             return true;
         }
     } else if (event.type == SDL_KEYUP) {
@@ -152,11 +179,6 @@ bool PlayMode::handle_event(SDL_Event const &event, glm::uvec2 drawable_size,
             return true;
         } else if (event.key.keysym.sym == SDLK_s) {
             player_.down.pressed = false;
-            return true;
-        } else if (event.key.keysym.sym == SDLK_SPACE) {
-            auto &grapple =
-                registry.get<GrapplingHookComponent>(grapple_entity);
-            grapple.unhold();
             return true;
         } else if (event.key.keysym.sym == SDLK_ESCAPE) {
             game.change_mode(GameMode::Mode::PauseMenuMode);

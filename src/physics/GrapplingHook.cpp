@@ -40,12 +40,27 @@ void GrapplingHookComponent::hold(entt::registry &registry) {
     glm::vec2 projVelocity =
         glm::dot(player_rigidBody.velocity, grapple_direction) *
         grapple_direction;
-    player_rigidBody.velocity -= 0.8f * projVelocity;
+    player_rigidBody.velocity -= 1.0f * projVelocity;
 }
 
 void GrapplingHookComponent::unhold() {
     if (!attached) return;
     held = false;
+}
+
+glm::vec2 GrapplingHookComponent::get_left_dir(glm::vec2 playerPos) {
+    glm::vec2 grappleDir = glm::normalize(attached_position - playerPos);
+    return glm::vec2(-grappleDir.y, grappleDir.x);
+}
+glm::vec2 GrapplingHookComponent::get_right_dir(glm::vec2 playerPos) {
+    glm::vec2 grappleDir = glm::normalize(attached_position - playerPos);
+    return glm::vec2(grappleDir.y, -grappleDir.x);
+}
+glm::vec2 GrapplingHookComponent::get_up_dir(glm::vec2 playerPos) {
+    return glm::normalize(attached_position - playerPos);
+}
+glm::vec2 GrapplingHookComponent::get_down_dir(glm::vec2 playerPos) {
+    return glm::normalize(playerPos - attached_position);
 }
 
 GrapplingHookComponent::GrapplingHookComponent(entt::entity self_,

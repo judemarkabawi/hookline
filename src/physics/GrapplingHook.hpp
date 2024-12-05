@@ -26,4 +26,9 @@ struct GrapplingHookComponent {
 
     void hold(entt::registry &registry);
     void unhold();
+
+    glm::vec2 get_left_dir(glm::vec2 playerPos);
+    glm::vec2 get_right_dir(glm::vec2 playerPos);
+    glm::vec2 get_up_dir(glm::vec2 playerPos);
+    glm::vec2 get_down_dir(glm::vec2 playerPos);
 };
