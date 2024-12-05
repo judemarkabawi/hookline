@@ -18,7 +18,7 @@ class RenderComponent {
     /**
      * Make a new RenderComponent using vertices and a (default) color.
      */
-    enum RenderType { BASE, GRAPPLE_POINT, COLLECTIBLE, PROJECTILE, PLAYER };
+    enum RenderType { BASE, GRAPPLE_POINT, COLLECTIBLE, PROJECTILE, PLAYER, WALL };
 
     RenderType type = BASE;
 

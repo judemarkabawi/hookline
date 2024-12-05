@@ -62,6 +62,13 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
                 camera_transform.position, camera.viewport_size,
                 camera.pixels_per_unit, renderable.use_texture_,
                 renderable.texture_);
+        } else if (renderable.type == RenderComponent::RenderType::WALL) {
+            glUseProgram(wall_shader.m.program);
+            wall_shader.updateUniforms(
+                transform.position, transform.scale, transform.rotation,
+                camera_transform.position, camera.viewport_size,
+                camera.pixels_per_unit, renderable.use_texture_,
+                renderable.texture_, drawable_size);
         } else if (renderable.type ==
                    RenderComponent::RenderType::GRAPPLE_POINT) {
             glUseProgram(grapple_shader.m.program);

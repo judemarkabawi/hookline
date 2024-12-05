@@ -15,6 +15,7 @@
 #include "shader/GrappleBoxShader.hpp"
 #include "shader/PlayerShader.hpp"
 #include "shader/ProjectileShader.hpp"
+#include "shader/WallShader.hpp"
 #include "util/misc.hpp"
 
 /**
@@ -57,6 +58,7 @@ class RenderSystem {
     CollectibleShader collectible_shader;
     ProjectileShader projectile_shader;
     PlayerShader player_shader;
+    WallShader wall_shader;
 
     Background<CyberpunkBackgroundShaderFull> background_;
     Background<CyberpunkBackgroundShader> menu_background_;

@@ -28,7 +28,7 @@ namespace {
  */
 entt::entity create_box(entt::registry &registry, glm::vec2 position,
                         glm::vec2 scale, bool hookable, bool breakable,
-                        bool damaging, glm::vec4 color) {
+                        bool damaging, glm::vec4 color, bool terrain = false) {
     auto box = registry.create();
     registry.emplace<TransformComponent>(
         box, TransformComponent(position, scale, 0.0f));
@@ -41,6 +41,8 @@ entt::entity create_box(entt::registry &registry, glm::vec2 position,
     RenderComponent::RenderType type = RenderComponent::RenderType::BASE;
     if (hookable) {
         type = RenderComponent::RenderType::GRAPPLE_POINT;
+    } else if (terrain) {
+        type = RenderComponent::RenderType::WALL;
     }
     registry.emplace<RenderComponent>(
         box, RenderComponent::from_vertices_color_tex(
@@ -106,7 +108,7 @@ void load_terrain(const json &data, Level &level) {
         glm::vec2 position(entry[0][0].get<float>(), entry[0][1].get<float>());
         glm::vec2 scale(entry[1][0].get<float>(), entry[1][1].get<float>());
         create_box(level.registry, position, scale, false, false, false,
-                   glm::vec4{0.2f, 0.2f, 0.2f, 1.0f});
+                   glm::vec4{0.2f, 0.2f, 0.2f, 1.0f}, true);
     }
 }
 
