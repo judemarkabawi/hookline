@@ -18,7 +18,7 @@ class RenderComponent {
     /**
      * Make a new RenderComponent using vertices and a (default) color.
      */
-    enum RenderType { BASE, GRAPPLE_POINT, COLLECTIBLE, PROJECTILE, PLAYER, WALL };
+    enum RenderType { BASE, GRAPPLE_POINT, COLLECTIBLE, PROJECTILE, PLAYER, WALL, ROPE};
 
     RenderType type = BASE;
 
@@ -34,8 +34,8 @@ class RenderComponent {
         RenderType type = BASE);
 
     static RenderComponent from_vertices_color_tex(
-        const std::vector<glm::vec2>& vertices, glm::vec4 color,
-        const std::vector<glm::vec2>& tex_coords, RenderType type = BASE);
+        const std::vector<glm::vec2>& vertices, glm::vec4 color = {0.0f, 0.0f, 0.0f, 1.0f},
+        const std::vector<glm::vec2>& tex_coords = {{0.0f, 0.0f}, {1.0, 0.0}, {0.0, 1.0}, {1.0, 1.0}}, RenderType type = BASE);
 
     ~RenderComponent() = default;
 

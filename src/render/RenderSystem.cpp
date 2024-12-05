@@ -104,6 +104,13 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
                 camera_transform.position, camera.viewport_size,
                 camera.pixels_per_unit, u_time,
                 (float)health.health / (float)health.inital_health);
+        } else if (renderable.type == RenderComponent::RenderType::ROPE) {
+            glUseProgram(grapple_rope_shader.m.program);
+            grapple_rope_shader.updateUniforms(
+                transform.position, transform.scale, transform.rotation,
+                camera_transform.position, camera.viewport_size,
+                camera.pixels_per_unit, u_time, drawable_size
+            );
         }
 
         // Draw
