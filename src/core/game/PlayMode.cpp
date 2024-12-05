@@ -34,38 +34,41 @@ PlayMode::PlayMode()
     Sound::loop(asset_manager.get_sound("guitar_loop_music"), 0.25);
 }
 
-void PlayMode::update(float dt, Game &_) {
+void PlayMode::update(float dt, Game &game) {
     /* -- PLAYER INPUT & GRAPPLE -- */
-    // TODO: Put input into a separate input component and handle this movement
-    auto &inputs = registry.get<InputComponent>(player_.entity);
-    inputs.movement = {0.0f, 0.0f};
-    if (player_.up.pressed) {
-        inputs.movement += glm::vec2{0.0f, hookline::player_movement_force.y};
-    }
-    if (player_.down.pressed) {
-        inputs.movement += glm::vec2{0, -hookline::player_movement_force.y};
-    }
-    if (player_.left.pressed) {
-        inputs.movement += glm::vec2{-hookline::player_movement_force.x, 0.0f};
-    }
-    if (player_.right.pressed) {
-        inputs.movement += glm::vec2{hookline::player_movement_force.x, 0.0f};
-    }
-    // Grapple inputs - all manual stuff, fix later
     auto &player_transform = registry.get<TransformComponent>(player_.entity);
     auto [grapple_transform, grapple_renderable, grapple] =
         registry
             .get<TransformComponent, RenderComponent, GrapplingHookComponent>(
                 grapple_entity);
+
+    // TODO: Put input into a separate input component and handle this movement
+    auto &inputs = registry.get<InputComponent>(player_.entity);
+    inputs.movement = {0.0f, 0.0f};
+    if (player_.up.pressed) {
+        float force = (grapple.attached ? hookline::player_movement_force.y : 0.0f); 
+        inputs.movement += glm::vec2{0.0f, force};
+    }
+    if (player_.left.pressed) {
+        float force = (grapple.attached ? 2.0f : 1.0f) * -hookline::player_movement_force.x;
+        inputs.movement += glm::vec2{force, 0.0f};
+    }
+    if (player_.right.pressed) {
+        float force = (grapple.attached ? 2.0f : 1.0f) * hookline::player_movement_force.x;
+        inputs.movement += glm::vec2{force, 0.0f};
+    }
+
+    //   Track grapple to player
     grapple_transform.position = player_transform.position;
 
-    // Convert mouse click position to world position
+    //   Convert mouse click position to world position
     auto [camera_transform, camera] =
         registry.get<TransformComponent, CameraComponent>(camera_entity);
     glm::vec2 target_world_position = hookline::convert_opengl_mouse_to_world(
         player_.mouse.position, camera_transform.position, camera.viewport_size,
         camera.pixels_per_unit);
 
+    //   Attach or detach grapple
     if (player_.mouse.pressed) {
         grapple.try_attach(player_transform.position, target_world_position,
                            registry);
@@ -96,11 +99,11 @@ void PlayMode::update(float dt, Game &_) {
         if (registry.all_of<ColliderComponent>(player_.entity)) {
             registry.remove<ColliderComponent>(player_.entity);
         }
-        _.change_mode(GameMode::Mode::GameOverMenuMode);
+        game.change_mode(GameMode::Mode::GameOverMenuMode);
     }
     
     if(player_transform.position[1] < -5.f){
-        _.change_mode(GameMode::Mode::WinMenuMode);
+        game.change_mode(GameMode::Mode::WinMenuMode);
     }
 
     // System updates
