@@ -69,7 +69,7 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
                 transform.position, transform.scale, transform.rotation,
                 camera_transform.position, camera.viewport_size,
                 camera.pixels_per_unit, renderable.use_texture_,
-                renderable.texture_, u_time);
+                renderable.texture_, u_time, drawable_size);
         } else if (renderable.type ==
                    RenderComponent::RenderType::COLLECTIBLE) {
             glUseProgram(collectible_shader.m.program);
@@ -92,7 +92,6 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
         } else if (renderable.type == RenderComponent::RenderType::PLAYER) {
             glUseProgram(player_shader.m.program);
             auto health = registry.get<HealthComponent>(entity);
-            // printf("%f\n", (float)health.health/(float)health.inital_health);
             player_shader.updateUniforms(
                 transform.position, transform.scale, transform.rotation,
                 camera_transform.position, camera.viewport_size,

@@ -28,6 +28,7 @@ GrappleBoxShader::GrappleBoxShader() {
     m.u_frag_use_texture_loc =
         glGetUniformLocation(m.program, "u_frag_use_texture");
     m.u_time_loc = glGetUniformLocation(m.program, "u_time");
+    m.u_resolution = glGetUniformLocation(m.program, "u_resolution");
 }
 
 GrappleBoxShader::~GrappleBoxShader() { glDeleteProgram(m.program); }
@@ -60,7 +61,7 @@ void GrappleBoxShader::updateUniforms(glm::vec2 user_pos, glm::vec2 u_scale,
                                       glm::vec2 camera_viewport_size,
                                       float camera_pixels_per_unit,
                                       int frag_use_texture, GLuint texture,
-                                      float u_time) {
+                                      float u_time, glm::vec2 resolution) {
     // Uniforms
     // -- Vertex shader
     glUniform2f(m.u_position_loc, user_pos.x, user_pos.y);
@@ -72,6 +73,7 @@ void GrappleBoxShader::updateUniforms(glm::vec2 user_pos, glm::vec2 u_scale,
     glUniform1f(m.u_camera_pixels_per_unit_loc, camera_pixels_per_unit);
     // -- Fragment shader
     glUniform1i(m.u_frag_use_texture_loc, frag_use_texture);
+    glUniform1i(m.u_scale_loc, frag_use_texture);
 
     // Texture
     if (frag_use_texture) {
@@ -80,4 +82,5 @@ void GrappleBoxShader::updateUniforms(glm::vec2 user_pos, glm::vec2 u_scale,
         glUniform1i(m.u_frag_texture_loc, 0);
     }
     glUniform1f(m.u_time_loc, u_time);
+    glUniform2f(m.u_resolution, resolution.x, resolution.y);
 }

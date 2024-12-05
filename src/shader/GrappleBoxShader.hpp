@@ -42,11 +42,13 @@ struct GrappleBoxShader {
         GLuint u_frag_texture_loc = 0;
         GLuint u_frag_use_texture_loc = 0;
         GLuint u_time_loc = 0;
+        GLuint u_resolution = 0;
+
     } m;
 
     // call after binding vertex arrays
     void updateUniforms(glm::vec2 user_pos, glm::vec2 u_scale, float u_rotation,
                         glm::vec2 camera_pos, glm::vec2 camera_viewport_size,
                         float camera_pixels_per_unit, int frag_use_texture,
-                        GLuint texture, float u_time);
+                        GLuint texture, float u_time, glm::vec2 resolution);
 };
