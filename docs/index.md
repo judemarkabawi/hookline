@@ -2,6 +2,8 @@
 
 Hookline is a 2D platformer where you use a grappling hook to zip around a futuristic city. Your mission? Avoid hazards, figure out where to go, and use your grappling hook and boosts to reach your goal.
 
+**Authors**: Jude Markabawi, Dante Liang, Lucas Hurley, Vishant Raajkumar
+
 ![Gameplay Screenshot](screenshot.png)
 
 ![Gameplay GIF](gameplay.gif)
@@ -24,6 +26,6 @@ Hookline is a 2D platformer where you use a grappling hook to zip around a futur
 - `Esc` - Pause game  
 
 ## Download
-- [Windows](https://github.com/judemarkabawi/hookline/actions/runs/12188141632/artifacts/2281809708)
-- [Linux](https://github.com/judemarkabawi/hookline/actions/runs/12188141632/artifacts/2281775605)
+- [Windows](https://github.com/judemarkabawi/hookline/releases/download/v1/hookline-windows.zip)
+- [Linux](https://github.com/judemarkabawi/hookline/releases/download/v1/hookline-linux.zip)
 - [MacOS (experimental)]()
