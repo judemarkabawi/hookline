@@ -2,8 +2,8 @@
 #include <glm/glm.hpp>
 
 #include "CollectableComponent.hpp"
-#include "core/AssetManager.hpp"
 #include "RespawnerQueue.hpp"
+#include "core/AssetManager.hpp"
 
 class CollectableSystem {
    public:

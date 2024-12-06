@@ -75,11 +75,9 @@ void CollectableSystem::spawn_random(entt::registry &registry) {
 void CollectableSystem::on_pickup(entt::registry &registry,
                                   entt::entity collectable,
                                   entt::entity player_entity) {
-
     auto &transform = registry.get<TransformComponent>(collectable);
     auto &collectable_component =
         registry.get<CollectableComponent>(collectable);
-
 
     switch (collectable_component.type) {
         case CollectableType::Feather: {
@@ -105,7 +103,8 @@ void CollectableSystem::on_pickup(entt::registry &registry,
             float boost_multiplier = 3.0f;
             player_rigidbody.velocity += boost_direction * boost_multiplier;
 
-            respawner_queue_.add_respawn(transform.position, collectable_component.type, 3.0f);
+            respawner_queue_.add_respawn(transform.position,
+                                         collectable_component.type, 3.0f);
 
             break;
         }

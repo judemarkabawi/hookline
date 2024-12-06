@@ -26,9 +26,10 @@ namespace {
 /**
     Helper to make a manually defined box on the map.
  */
-entt::entity create_box(entt::registry &registry, glm::vec2 position,
-                        glm::vec2 scale, bool hookable, bool breakable,
-                        bool damaging, glm::vec4 color, RenderComponent::RenderType type = RenderComponent::RenderType::BASE) {
+entt::entity create_box(
+    entt::registry &registry, glm::vec2 position, glm::vec2 scale,
+    bool hookable, bool breakable, bool damaging, glm::vec4 color,
+    RenderComponent::RenderType type = RenderComponent::RenderType::BASE) {
     auto box = registry.create();
     registry.emplace<TransformComponent>(
         box, TransformComponent(position, scale, 0.0f));
@@ -38,10 +39,10 @@ entt::entity create_box(entt::registry &registry, glm::vec2 position,
                                                  .set_hookable(hookable)
                                                  .set_breakable(breakable)
                                                  .set_damaging(damaging));
-    //RenderComponent::RenderType type = RenderComponent::RenderType::BASE;
+    // RenderComponent::RenderType type = RenderComponent::RenderType::BASE;
     if (hookable) {
         type = RenderComponent::RenderType::GRAPPLE_POINT;
-    } 
+    }
 
     registry.emplace<RenderComponent>(
         box, RenderComponent::from_vertices_color_tex(
@@ -107,7 +108,8 @@ void load_terrain(const json &data, Level &level) {
         glm::vec2 position(entry[0][0].get<float>(), entry[0][1].get<float>());
         glm::vec2 scale(entry[1][0].get<float>(), entry[1][1].get<float>());
         create_box(level.registry, position, scale, false, false, false,
-                   glm::vec4{0.2f, 0.2f, 0.2f, 1.0f},  RenderComponent::RenderType::WALL);
+                   glm::vec4{0.2f, 0.2f, 0.2f, 1.0f},
+                   RenderComponent::RenderType::WALL);
     }
 }
 
@@ -292,7 +294,8 @@ Level Level::load_json(const std::string &filename) {
         level.registry.emplace<RenderComponent>(
             grapple_entity, RenderComponent::from_vertices_color_tex(
                                 hookline::get_basic_shape_debug(), black,
-                                hookline::get_basic_uvs_debug(), RenderComponent::RenderType::ROPE));
+                                hookline::get_basic_uvs_debug(),
+                                RenderComponent::RenderType::ROPE));
         level.grapple = grapple_entity;
     }
 

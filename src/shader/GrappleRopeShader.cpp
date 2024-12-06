@@ -24,7 +24,6 @@ GrappleRopeShader::GrappleRopeShader() {
     m.u_camera_pixels_per_unit_loc =
         glGetUniformLocation(m.program, "u_camera_pixels_per_unit");
 
-
     m.u_time_loc = glGetUniformLocation(m.program, "u_time");
     m.u_resolution = glGetUniformLocation(m.program, "u_resolution");
 }
@@ -55,10 +54,10 @@ GrappleRopeShader& GrappleRopeShader::operator=(
 }
 
 void GrappleRopeShader::updateUniforms(glm::vec2 user_pos, glm::vec2 u_scale,
-                                      float u_rotation, glm::vec2 camera_pos,
-                                      glm::vec2 camera_viewport_size,
-                                      float camera_pixels_per_unit,
-                                      float u_time, glm::vec2 resolution) {
+                                       float u_rotation, glm::vec2 camera_pos,
+                                       glm::vec2 camera_viewport_size,
+                                       float camera_pixels_per_unit,
+                                       float u_time, glm::vec2 resolution) {
     // Uniforms
     // -- Vertex shader
     glUniform2f(m.u_position_loc, user_pos.x, user_pos.y);

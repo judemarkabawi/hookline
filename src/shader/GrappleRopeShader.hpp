@@ -47,5 +47,6 @@ struct GrappleRopeShader {
     // call after binding vertex arrays
     void updateUniforms(glm::vec2 user_pos, glm::vec2 u_scale, float u_rotation,
                         glm::vec2 camera_pos, glm::vec2 camera_viewport_size,
-                        float camera_pixels_per_unit, float u_time, glm::vec2 resolution);
+                        float camera_pixels_per_unit, float u_time,
+                        glm::vec2 resolution);
 };

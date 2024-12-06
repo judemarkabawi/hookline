@@ -109,8 +109,7 @@ void RenderSystem::render(glm::uvec2 drawable_size, entt::registry &registry,
             grapple_rope_shader.updateUniforms(
                 transform.position, transform.scale, transform.rotation,
                 camera_transform.position, camera.viewport_size,
-                camera.pixels_per_unit, u_time, drawable_size
-            );
+                camera.pixels_per_unit, u_time, drawable_size);
         }
 
         // Draw

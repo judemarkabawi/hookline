@@ -3,10 +3,10 @@
 #include <memory>
 
 #include "core/game/GameMode.hpp"
+#include "core/game/GameOverMenuMode.hpp"
 #include "core/game/PauseMenuMode.hpp"
 #include "core/game/PlayMode.hpp"
 #include "core/game/StartMenuMode.hpp"
-#include "core/game/GameOverMenuMode.hpp"
 #include "core/game/WinMenuMode.hpp"
 
 Game::Game() {
@@ -15,7 +15,6 @@ Game::Game() {
     play_game_ = std::make_unique<PlayMode>();
     win_menu_ = std::make_unique<WinMenuMode>();
     game_over_menu_ = std::make_unique<GameOverMenuMode>();
-    
 
     current_mode_ = static_cast<GameMode *>(start_menu_.get());
 }
@@ -44,6 +43,4 @@ void Game::change_mode(GameMode::Mode mode) {
     }
 }
 
-void Game::restart() {
-    play_game_ = std::make_unique<PlayMode>();
-}
+void Game::restart() { play_game_ = std::make_unique<PlayMode>(); }

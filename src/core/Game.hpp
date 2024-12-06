@@ -6,10 +6,10 @@
 #include <memory>
 
 #include "core/game/GameMode.hpp"
+#include "core/game/GameOverMenuMode.hpp"
 #include "core/game/PauseMenuMode.hpp"
 #include "core/game/PlayMode.hpp"
 #include "core/game/StartMenuMode.hpp"
-#include "core/game/GameOverMenuMode.hpp"
 #include "core/game/WinMenuMode.hpp"
 
 class Game {

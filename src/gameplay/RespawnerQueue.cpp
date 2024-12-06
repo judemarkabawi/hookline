@@ -1,9 +1,13 @@
-#include "CollectableSystem.hpp"
-#include <iostream>
 #include <glm/geometric.hpp>
+#include <iostream>
 
-void RespawnerQueue::add_respawn(glm::vec2 position, CollectableType type, float delay_seconds) {
-    auto respawn_time = std::chrono::steady_clock::now() + std::chrono::milliseconds(static_cast<int>(delay_seconds * 1000));
+#include "CollectableSystem.hpp"
+
+void RespawnerQueue::add_respawn(glm::vec2 position, CollectableType type,
+                                 float delay_seconds) {
+    auto respawn_time =
+        std::chrono::steady_clock::now() +
+        std::chrono::milliseconds(static_cast<int>(delay_seconds * 1000));
     queue_.emplace(respawn_time, position, type);
 }
 

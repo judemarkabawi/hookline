@@ -4,8 +4,8 @@
 #include "util/gl_compile_program.hpp"
 
 WallShader::WallShader() {
-    ShaderSource shader_source = hookline::load_shader_file(
-        "BasicMeshShader.vert", "WallShader.frag");
+    ShaderSource shader_source =
+        hookline::load_shader_file("BasicMeshShader.vert", "WallShader.frag");
     m.program = gl_compile_program(shader_source.vertex_source,
                                    shader_source.fragment_source);
 
@@ -32,13 +32,11 @@ WallShader::WallShader() {
 
 WallShader::~WallShader() { glDeleteProgram(m.program); }
 
-WallShader::WallShader(WallShader&& other) noexcept
-    : m(other.m) {
+WallShader::WallShader(WallShader&& other) noexcept : m(other.m) {
     other.m.program = 0;
 }
 
-WallShader& WallShader::operator=(
-    WallShader&& other) noexcept {
+WallShader& WallShader::operator=(WallShader&& other) noexcept {
     if (this == &other) {
         return *this;
     }
@@ -56,11 +54,11 @@ WallShader& WallShader::operator=(
 }
 
 void WallShader::updateUniforms(glm::vec2 user_pos, glm::vec2 u_scale,
-                                      float u_rotation, glm::vec2 camera_pos,
-                                      glm::vec2 camera_viewport_size,
-                                      float camera_pixels_per_unit,
-                                      int frag_use_texture, GLuint texture,
-                                      glm::vec2 resolution) {
+                                float u_rotation, glm::vec2 camera_pos,
+                                glm::vec2 camera_viewport_size,
+                                float camera_pixels_per_unit,
+                                int frag_use_texture, GLuint texture,
+                                glm::vec2 resolution) {
     // Uniforms
     // -- Vertex shader
     glUniform2f(m.u_position_loc, user_pos.x, user_pos.y);
