@@ -19,6 +19,10 @@ class Game {
     void update(float dt);
     void render(glm::uvec2 drawable_size);
     bool handle_event(SDL_Event const &event, glm::uvec2 drawable_size);
+    /**
+     * Restart PlayMode
+     */
+    void restart();
 
     void change_mode(GameMode::Mode mode);
 

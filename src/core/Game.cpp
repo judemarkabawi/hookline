@@ -43,3 +43,7 @@ void Game::change_mode(GameMode::Mode mode) {
         current_mode_ = play_game_.get();
     }
 }
+
+void Game::restart() {
+    play_game_ = std::make_unique<PlayMode>();
+}
