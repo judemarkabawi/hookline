@@ -38,43 +38,18 @@ Mesh2D Mesh2D::from_verts_texture(const std::vector<glm::vec2> &vertices,
     return Mesh2D::from_verts(std::move(verts));
 }
 
-Mesh2D::~Mesh2D() { cleanup(); }
-
-Mesh2D::Mesh2D(Mesh2D &&other)
-    : vao(other.vao), vbo(other.vbo), verts(std::move(other.verts)) {
-    other.vao = 0;
-    other.vbo = 0;
-}
-
-Mesh2D &Mesh2D::operator=(Mesh2D &&other) {
-    if (this == &other) {
-        return *this;
-    }
-
-    // Clean up current objects
-    cleanup();
-
-    // Move
-    vao = other.vao;
-    vbo = other.vbo;
-    verts = std::move(other.verts);
-
-    // Reset other
-    other.vao = 0;
-    other.vbo = 0;
-
-    return *this;
-}
+GLuint Mesh2D::vao() const { return vao_.vao; }
+GLuint Mesh2D::vbo() const { return vbo_.vbo; }
 
 void Mesh2D::setup() {
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
+    glGenVertexArrays(1, &vao_.vao);
+    glGenBuffers(1, &vbo_.vbo);
 
     // Bind VAO
-    glBindVertexArray(vao);
+    glBindVertexArray(vao());
 
     // Vertex data
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo());
     glBufferData(GL_ARRAY_BUFFER, verts.size() * sizeof(Vertex), verts.data(),
                  GL_STATIC_DRAW);
 
@@ -90,9 +65,4 @@ void Mesh2D::setup() {
     glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                           (void *)offsetof(Vertex, color));
     glEnableVertexAttribArray(2);
-}
-
-void Mesh2D::cleanup() {
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
 }
