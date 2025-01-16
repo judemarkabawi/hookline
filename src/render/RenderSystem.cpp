@@ -236,10 +236,9 @@ void RenderSystem::render_background(glm::uvec2 drawable_size,
 /**
  * Render all text objects
  *
- * TODO: Inefficent - should only shape text once/on text update, not per frame
- *
- * TODO: Inefficient - move scaling by drawable_size to an ortho matrix, not
- * manual
+ * TODO: Inefficient
+ *   - should only shape text once/on text update, not per frame
+ *   - move scaling by drawable_size to an ortho matrix, not manually
  */
 void RenderSystem::render_text(glm::uvec2 drawable_size,
                                entt::registry &registry) {

@@ -14,7 +14,6 @@ struct GrapplingHookComponent {
     entt::entity self;
     entt::entity user;
     bool attached = false;
-    bool held = false;
     glm::vec2 attached_position;
     float curr_length = 0.0f;
 
@@ -23,9 +22,6 @@ struct GrapplingHookComponent {
     void try_attach(glm::vec2 start_position, glm::vec2 target_position,
                     entt::registry &registry);
     void detach();
-
-    void hold(entt::registry &registry);
-    void unhold();
 
     glm::vec2 get_left_dir(glm::vec2 playerPos);
     glm::vec2 get_right_dir(glm::vec2 playerPos);

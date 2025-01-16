@@ -162,14 +162,6 @@ bool PlayMode::handle_event(SDL_Event const &event, glm::uvec2 drawable_size,
         } else if (event.key.keysym.sym == SDLK_s) {
             player_.down.pressed = true;
             return true;
-        } else if (event.key.keysym.sym == SDLK_SPACE) {
-            auto &grapple =
-                registry.get<GrapplingHookComponent>(grapple_entity);
-            if (!grapple.held)
-                grapple.hold(registry);
-            else
-                grapple.unhold();
-            return true;
         }
     } else if (event.type == SDL_KEYUP) {
         if (event.key.keysym.sym == SDLK_a) {

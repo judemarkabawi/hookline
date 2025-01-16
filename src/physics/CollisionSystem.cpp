@@ -55,7 +55,6 @@ void CollisionSystem::update(float dt, entt::registry &registry) {
 
 /**
  * Basic collision resolution algorithm adapted from various sources
- * TODO: Make this better - bouncing and sliding and more than AABB
  */
 void CollisionSystem::handle_collision(entt::entity entity1,
                                        entt::entity entity2,

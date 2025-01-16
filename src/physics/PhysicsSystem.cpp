@@ -19,19 +19,9 @@ void PhysicsSystem::update(float dt, entt::registry& registry) {
             // Add pulling force
             glm::vec2 grapple_direction = glm::normalize(
                 grapple.attached_position - player_transform.position);
-            if (grapple.held) {
-                float cosTheta = -grapple_direction.y;
-                float r = glm::length(grapple.attached_position -
-                                      player_transform.position);
-                glm::vec2 tanDir =
-                    glm::vec2(-grapple_direction.y, grapple_direction.x);
-                float v = glm::dot(player_rigidBody.velocity, tanDir);
-                float centripetalAccel = (v * v) / r;
-                float tension = player_rigidBody.mass *
-                                (hookline::g * cosTheta + centripetalAccel);
-                player_forces.add_force(grapple_direction * tension);
-            } else if (grapple.attached)
+            if (grapple.attached) {
                 player_forces.add_force(grapple_direction * grapple.pull_force);
+            }
 
             // Deactive grapple when close
             if (glm::distance(player_transform.position,
