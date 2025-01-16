@@ -9,13 +9,13 @@
 PauseMenuMode::PauseMenuMode() {
     entt::entity title = registry_.create();
     registry_.emplace<TextComponent>(
-        title, TextComponent::from_text("Paused", {-0.35, 0.5}, 5.0f));
+        title, TextComponent::from_text("Paused", {0.0, 0.5}, 3.0f));
 
     entt::entity play_button = registry_.create();
     registry_.emplace<TextComponent>(
         play_button,
         TextComponent::from_text("Press [Esc] to resume or [Q] to quit",
-                                 {-0.75, -0.1}, 1.0f));
+                                 {0.0, -0.1}, 1.0f));
 }
 
 void PauseMenuMode::update(float dt, Game& _) {

@@ -247,44 +247,46 @@ void RenderSystem::render_text(glm::uvec2 drawable_size,
     // Render every text component
     auto view = registry.view<TextComponent>();
     for (const auto [_, text] : view.each()) {
-        // Vertex attribute data
-        glBindVertexArray(text.mesh.vao());
-
-        // Text shader program
-        glUseProgram(text.shader.program.program);
-
-        glm::vec2 scale_to_screen =
-            2.0f / glm::vec2{drawable_size.x, drawable_size.y};
-
-        glm::vec2 scaled_position = text.position / scale_to_screen;
-        float x = scaled_position.x;  // Starting x position
-        float y = scaled_position.y;  // Starting y position
-        float scale = text.scale;     // Scale for the text rendering
-
         // Shape text and generate glyph map -- inefficent
         GlyphData glyphs_data = text_renderer.shape_text(text.text);
-
-        // Iterate over all glyphs in the glyph map and render them:
         std::vector<Glyph> glyphs =
             text_renderer.generate_glyph_textures(glyphs_data);
+
+        // Scaling and positioning
+        auto screen_to_opengl = [=](glm::vec2 v) {
+            return hookline::screen_to_opengl(v, drawable_size);
+        };
+        auto opengl_to_screen = [=](glm::vec2 v) {
+            return hookline::opengl_to_screen(v, drawable_size);
+        };
+
+        float scale = text.scale;  // Scale for the text rendering
+        float x = get_centered_x_position(drawable_size, glyphs,
+                                          scale);     // Starting x position
+        float y = opengl_to_screen(text.position).y;  // Starting y position
+
+        // Rendering
+        glBindVertexArray(text.mesh.vao());
+        glUseProgram(text.shader.program.program);
+
         for (auto const &glyph_entry : glyphs) {
             Glyph ch = glyph_entry;
 
             // Calculate the position and size of the current glyph:
             float xpos = x + ch.bearing.x * scale;
-            float ypos = y - (ch.size.y - ch.bearing.y) * scale;
+            float ypos = y + (ch.size.y - ch.bearing.y) * scale;
             float w = ch.size.x * scale;
             float h = ch.size.y * scale;
 
             // Update the content of VBO memory with the quad vertices:
             text.mesh.verts[0].position =
-                glm::vec2{xpos, ypos + h} * scale_to_screen;
+                screen_to_opengl(glm::vec2{xpos, ypos - h});
             text.mesh.verts[1].position =
-                glm::vec2{xpos + w, ypos + h} * scale_to_screen;
+                screen_to_opengl(glm::vec2{xpos + w, ypos - h});
             text.mesh.verts[2].position =
-                glm::vec2{xpos, ypos} * scale_to_screen;
+                screen_to_opengl(glm::vec2{xpos, ypos});
             text.mesh.verts[3].position =
-                glm::vec2{xpos + w, ypos} * scale_to_screen;
+                screen_to_opengl(glm::vec2{xpos + w, ypos});
             glBindBuffer(GL_ARRAY_BUFFER, text.mesh.vbo());
             glBufferSubData(GL_ARRAY_BUFFER, 0,
                             text.mesh.verts.size() * sizeof(Vertex),
@@ -299,7 +301,6 @@ void RenderSystem::render_text(glm::uvec2 drawable_size,
             glDrawArrays(GL_TRIANGLE_STRIP, 0, text.mesh.verts.size());
 
             // Advance the cursor for the next glyph (accounting for scaling):
-            // Bitshift by 6 to convert from 1/64th pixels to pixels
             x += (ch.advance) * scale;
         }
     }

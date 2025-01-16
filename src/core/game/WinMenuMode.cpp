@@ -10,12 +10,12 @@ WinMenuMode::WinMenuMode() {
     entt::entity title = registry_.create();
     registry_.emplace<TextComponent>(
         title,
-        TextComponent::from_text("Thank you for playing!", {-0.35, 0.5}, 1.0f));
+        TextComponent::from_text("Thank you for playing!", {0.0, 0.5}, 1.0f));
 
     entt::entity play_button = registry_.create();
     registry_.emplace<TextComponent>(
-        play_button, TextComponent::from_text("Click anywhere to exit",
-                                              {-0.75, -0.1}, 1.0f));
+        play_button,
+        TextComponent::from_text("Click anywhere to exit", {0.0f, -0.1}, 1.0f));
 }
 
 void WinMenuMode::update(float dt, Game& _) {

@@ -10,12 +10,12 @@
 GameOverMenuMode::GameOverMenuMode() {
     entt::entity title = registry_.create();
     registry_.emplace<TextComponent>(
-        title, TextComponent::from_text("Game Over", {-0.35, 0.5}, 5.0f));
+        title, TextComponent::from_text("Game Over", {0.0, 0.5}, 3.0f));
 
     entt::entity play_button = registry_.create();
     registry_.emplace<TextComponent>(
         play_button, TextComponent::from_text("Click anywhere to restart game",
-                                              {-0.75, -0.1}, 1.0f));
+                                              {0.0, -0.1}, 1.0f));
 }
 
 void GameOverMenuMode::update(float dt, Game& _) {
