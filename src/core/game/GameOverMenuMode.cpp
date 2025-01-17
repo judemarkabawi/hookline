@@ -14,7 +14,7 @@ GameOverMenuMode::GameOverMenuMode() {
 
     entt::entity play_button = registry_.create();
     registry_.emplace<TextComponent>(
-        play_button, TextComponent::from_text("Click anywhere to restart game",
+        play_button, TextComponent::from_text("Click anywhere to quit",
                                               {0.0, -0.1}, 1.0f));
 }
 
