@@ -1,3 +1,7 @@
+/**
+ * GameMode represents different states the game is in, mainly Paused modes in
+ * menus and the main game PlayMode.
+ */
 #pragma once
 
 #include <SDL2/SDL.h>

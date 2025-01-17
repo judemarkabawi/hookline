@@ -1,3 +1,9 @@
+/**
+ * A queue for respawning collectables after a delay.
+ *
+ * Used for e.g. respawning the boost items.
+ */
+
 #include <chrono>
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>

@@ -1,3 +1,6 @@
+/**
+ * A moving projectile that can harm the player.
+ */
 #pragma once
 
 #include <glm/glm.hpp>

@@ -1,11 +1,3 @@
-/**
- * @file TextRenderer.cpp
- * @author Dante Liang, Jude Markabawi
- *
- * Most code adapted from Dante at
- * https://github.com/ZySerika/15-466-f24-base4/blob/main/hb-ftt.cpp
- */
-
 #include "TextRenderer.hpp"
 
 #include <hb-ft.h>

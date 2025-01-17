@@ -1,9 +1,3 @@
-/**
- * @file BasicMeshShader.hpp
- *
- * GL Shader program for 2D meshes with per-vertex color, or a single texture.
- */
-
 #pragma once
 
 #include <GL/glew.h>

@@ -1,6 +1,5 @@
 /**
- * @file TextRenderer.hpp
- * @author Dante Liang, Jude Markabawi
+ * Handles generating text structures for rendering.
  *
  * Most code adapted from Dante at
  * https://github.com/ZySerika/15-466-f24-base4/blob/main/hb-ftt.hpp.

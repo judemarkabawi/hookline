@@ -1,7 +1,5 @@
 /**
- * @file Application.hpp
- *
- * Handles making the window and running the event/game loop.
+ * The Application handles making the window and running the event/game loop.
  */
 
 #pragma once

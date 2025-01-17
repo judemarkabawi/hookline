@@ -1,3 +1,8 @@
+/**
+ * Represents a string of text to be displayed on the screen. Position should be
+ * in the OpenGL screen coordinate system (-1 to 1).
+ */
+
 #pragma once
 
 #include <glm/glm.hpp>

@@ -1,3 +1,8 @@
+/**
+ * Level contains all the data for a single level of the game, including loaded
+ * assets, the player, obstacles, etc.
+ */
+
 #pragma once
 
 #include <entt/entt.hpp>

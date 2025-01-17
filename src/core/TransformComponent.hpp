@@ -1,3 +1,6 @@
+/**
+ * TransformComponent contains the position, scale, and rotation of an object.
+ */
 #pragma once
 
 #include <glm/glm.hpp>

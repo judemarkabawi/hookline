@@ -1,3 +1,7 @@
+/**
+ * Component on the map that spawns projectiles.
+ */
+
 #pragma once
 
 #include <glm/glm.hpp>

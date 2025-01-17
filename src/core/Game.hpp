@@ -1,3 +1,8 @@
+/**
+ * Game stores data for the game (using the modes) and just handles passing
+ * inputs/updates/render through to the mode the game is in.
+ */
+
 #pragma once
 
 #include <SDL2/SDL.h>

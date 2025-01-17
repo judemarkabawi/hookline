@@ -1,3 +1,7 @@
+/**
+ * AssetManager handles loading textures and sounds.
+ */
+
 #pragma once
 
 #include <GL/glew.h>

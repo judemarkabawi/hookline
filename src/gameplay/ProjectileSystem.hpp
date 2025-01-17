@@ -1,3 +1,7 @@
+/**
+ * System updating projectiles in the level.
+ */
+
 #pragma once
 
 #include <entt/entt.hpp>

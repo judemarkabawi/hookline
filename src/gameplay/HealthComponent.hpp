@@ -1,3 +1,7 @@
+/**
+ * Player's health.
+ */
+
 #pragma once
 
 #include <glm/glm.hpp>

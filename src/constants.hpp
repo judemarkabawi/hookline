@@ -1,6 +1,4 @@
 /**
- * @file constants.hpp
- *
  * Useful constants for use throughout the game.
  */
 

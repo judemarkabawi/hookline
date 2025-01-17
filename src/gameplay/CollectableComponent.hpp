@@ -1,3 +1,7 @@
+/**
+ * Component for collectable items.
+ */
+
 #pragma once
 
 enum class CollectableType {

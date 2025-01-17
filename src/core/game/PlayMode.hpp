@@ -1,7 +1,5 @@
 /**
- * @file Game.hpp
- *
- * Handles game state, update, rendering, etc.
+ * The main game mode when the game is playing.
  */
 
 #pragma once

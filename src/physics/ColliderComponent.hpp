@@ -1,3 +1,7 @@
+/**
+ * Component for objects that collide.
+ */
+
 #pragma once
 
 #include <glm/glm.hpp>

@@ -1,3 +1,7 @@
+/**
+ * System managing and updating collectables on the map.
+ */
+
 #include <entt/entt.hpp>
 #include <glm/glm.hpp>
 
